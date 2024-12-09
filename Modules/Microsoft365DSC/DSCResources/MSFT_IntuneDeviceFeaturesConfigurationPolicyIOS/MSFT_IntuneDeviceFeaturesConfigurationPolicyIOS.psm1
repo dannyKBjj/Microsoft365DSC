@@ -824,9 +824,22 @@ function Export-TargetResource
 
             if ($null -ne $Results.contentFilterSettings)
             {
+                $complexMapping = @(
+                    @{
+                        Name = 'websiteList'
+                        CimInstanceName = 'iosWebContentFilterBase'
+                        IsRequired = $false
+                    }
+                    @{
+                        Name = 'specificWebsitesOnly'
+                        CimInstanceName = 'iosWebContentFilterBase'
+                        IsRequired = $false
+                    }
+                )
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.contentFilterSettings `
-                    -CIMInstanceName 'iosWebContentFilterSpecificWebsitesAccess'
+                    -CIMInstanceName 'iosWebContentFilterSpecificWebsitesAccess' `
+                    -ComplexTypeMapping $complexMapping
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
                     $Results.contentFilterSettings = $complexTypeStringResult
@@ -854,9 +867,18 @@ function Export-TargetResource
 
             if ($null -ne $Results.homeScreenPages)
             {
+                $complexMapping = @(
+                    @{
+                        Name = 'icons'
+                        CimInstanceName = 'iosHomeScreenItem'
+                        IsRequired = $false
+                    }
+                    
+                )
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.homeScreenPages `
-                    -CIMInstanceName 'MSFT_iosHomeScreenItem' 
+                    -CIMInstanceName 'MSFT_iosHomeScreenItem' `
+                    -ComplexTypeMapping $complexMapping
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
                     $Results.homeScreenPages = $complexTypeStringResult
@@ -884,14 +906,13 @@ function Export-TargetResource
             
             if ($null -ne $Results.iosSingleSignOnExtension)
             {
-
                 $complexMapping = @(
-                @{
-                    Name = 'configurations'
-                    CimInstanceName = 'keyStringValuePair'
-                    IsRequired = $false
-                }
-
+                    @{
+                        Name = 'configurations'
+                        CimInstanceName = 'keyStringValuePair'
+                        IsRequired = $false
+                    }
+                )
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.iosSingleSignOnExtension `
                     -CIMInstanceName 'MSFT_iosSingleSignOnExtension' `
