@@ -17,7 +17,58 @@ function Get-TargetResource
         [System.String]
         $Description,
 
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $airPrintDestinations,
 
+        [Parameter()]
+        [System.String]
+        $assetTagTemplate,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $contentFilterSettings,
+
+        [Parameter()]
+        [System.String]
+        $lockScreenFootnote,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenDockIcons,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenPages,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridWidth,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridHeight,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $notificationSettings,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $singleSignOnSettings,
+
+        [Parameter()]
+        [ValidateSet("notConfigured", "lockScreen", "homeScreen", "lockAndHomeScreens")]
+        [System.String]
+        $wallpaperDisplayLocation,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $wallpaperImage,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $iosSingleSignOnExtension,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
@@ -55,7 +106,7 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String[]]
-        $AccessTokens,
+        $AccessTokens
 
     )
 
@@ -110,67 +161,17 @@ function Get-TargetResource
 
         Write-Verbose -Message "An Intune VPN Policy for iOS with id {$id} and DisplayName {$DisplayName} was found"
 
-        $complexServers = @()
-        foreach ($currentservers in $getValue.AdditionalProperties.server)
+        $complexAirPrintDestinations = @()
+        foreach ($item in $getValue.AdditionalProperties.airPrintDestinations)
         {
-            $myservers = @{}
-            $myservers.Add('address', $currentservers.address)
-            $myservers.Add('description', $currentservers.description)
-            $myservers.Add('isDefaultServer', $currentservers.isDefaultServer)
-            if ($myservers.values.Where({$null -ne $_}).count -gt 0)
+            $hashTable = @{}
+            $hashTable.Add('ipAddress', $item.ipAddress)
+            $hashTable.Add('resourcePath', $item.resourcePath)
+            $hashTable.Add('port', $item.port)
+            $hashTable.Add('forceTls', $item.forceTls)
+            if ($htPrintDestinations.values.Where({$null -ne $_}).count -gt 0)
             {
-                $complexServers += $myservers
-            }
-        }
-
-        $complexProxyServers = @()
-        foreach ($currentservers in $getValue.AdditionalProperties.proxyServer)
-        {
-            $myservers = @{}
-            $myservers.Add('automaticConfigurationScriptUrl', $currentservers.automaticConfigurationScriptUrl)
-            $myservers.Add('address', $currentservers.address)
-            $myservers.Add('port', $currentservers.port)
-            if ($myservers.values.Where({$null -ne $_}).count -gt 0)
-            {
-                $complexProxyServers += $myservers
-            }
-        }
-
-        $complexCustomData = @()
-        foreach ($value in $getValue.AdditionalProperties.customData)
-        {
-            $myCustomdata = @{}
-            $myCustomdata.Add('key', $value.key)
-            $myCustomdata.Add('value', $value.value)
-            if ($myCustomdata.values.Where({$null -ne $_}).count -gt 0)
-            {
-                $complexCustomData += $myCustomdata
-            }
-        }
-
-        $complexCustomKeyValueData = @()
-        foreach ($value in $getValue.AdditionalProperties.customKeyValueData)
-        {
-            $myCVdata = @{}
-            $myCVdata.Add('name', $value.name)
-            $myCVdata.Add('value', $value.value)
-            if ($myCVdata.values.Where({$null -ne $_}).count -gt 0)
-            {
-                $complexCustomKeyValueData += $myCVdata
-            }
-        }
-
-        $complexTargetedMobileApps = @()
-        foreach ($value in $getValue.AdditionalProperties.targetedMobileApps)
-        {
-            $myTMAdata = @{}
-            $myTMAdata.Add('name', $value.name)
-            $myTMAdata.Add('publisher', $value.publisher)
-            $myTMAdata.Add('appStoreUrl', $value.appStoreUrl)
-            $myTMAdata.Add('appId', $value.appId)
-            if ($myTMAdata.values.Where({$null -ne $_}).count -gt 0)
-            {
-                $complexTargetedMobileApps += $myTMAdata
+                $complexAirPrintDestinations += $hashTable
             }
         }
 
@@ -187,19 +188,19 @@ function Get-TargetResource
             CertificateThumbprint    = $CertificateThumbprint
             Managedidentity          = $ManagedIdentity.IsPresent
             AccessTokens             = $AccessTokens
+            airPrintDestinations     = $complexAirPrintDestinations #Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.airPrintDestinations
             assetTagTemplate         = $getValue.AdditionalProperties.assetTagTemplate
+            contentFilterSettings    = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.contentFilterSettings
             lockScreenFootnote       = $getValue.AdditionalProperties.lockScreenFootnote
+            homeScreenDockIcons      = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.homeScreenDockIcons
+            homeScreenPages          = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.homeScreenPages
             homeScreenGridWidth      = $getValue.AdditionalProperties.homeScreenGridWidth
             homeScreenGridHeight     = $getValue.AdditionalProperties.homeScreenGridHeight
-            wallpaperDisplayLocation = $getValue.AdditionalProperties.wallpaperDisplayLocation
-            airPrintDestinations     = $getValue.AdditionalProperties.airPrintDestinations
-            contentFilterSettings    = $getValue.AdditionalProperties.contentFilterSettings
-            homeScreenDockIcons      = $getValue.AdditionalProperties.homeScreenDockIcons
-            homeScreenPages          = $getValue.AdditionalProperties.homeScreenPages
-            notificationSettings     = $getValue.AdditionalProperties.notificationSettings
-            singleSignOnSettings     = $getValue.AdditionalProperties.singleSignOnSettings
-            wallpaperImage           = $getValue.AdditionalProperties.wallpaperImage
-            iosSingleSignOnExtension = $getValue.AdditionalProperties.iosSingleSignOnExtension
+            notificationSettings     = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.notificationSettings
+            singleSignOnSettings     = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.singleSignOnSettings
+            wallpaperDisplayLocation = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.wallpaperDisplayLocation 
+            wallpaperImage           = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.wallpaperImage
+            iosSingleSignOnExtension = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.iosSingleSignOnExtension
 
         }
                                           
@@ -246,66 +247,57 @@ function Set-TargetResource
         $Description,
 
         [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $airPrintDestinations,
+
+        [Parameter()]
         [System.String]
-        $connectionName,
+        $assetTagTemplate,
 
         [Parameter()]
-        [ValidateSet('ciscoAnyConnect', 'pulseSecure', 'f5EdgeClient', 'dellSonicWallMobileConnect', 'checkPointCapsuleVpn', 'customVpn', 'ciscoIPSec', 'citrix', 'ciscoAnyConnectV2', 'paloAltoGlobalProtect', 'zscalerPrivateAccess', 'f5Access2018', 'citrixSso', 'paloAltoGlobalProtectV2', 'ikEv2', 'alwaysOn', 'microsoftTunnel', 'netMotionMobility', 'microsoftProtect')]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $contentFilterSettings,
+
+        [Parameter()]
         [System.String]
-        $connectionType,
+        $lockScreenFootnote,
 
         [Parameter()]
-        [System.Boolean]
-        $enableSplitTunneling,
-   
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenDockIcons,
+
         [Parameter()]
-        [ValidateSet('certificate', 'usernameAndPassword', 'sharedSecret', 'derivedCredential', 'azureAD')]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenPages,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridWidth,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridHeight,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $notificationSettings,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $singleSignOnSettings,
+
+        [Parameter()]
+        [ValidateSet("notConfigured", "lockScreen", "homeScreen", "lockAndHomeScreens")]
         [System.String]
-        $authenticationMethod,        
-        
-        [Parameter()]
-        [System.string[]]
-        $safariDomains,
-
-        [Parameter()]
-        [System.string[]]
-        $associatedDomains,
-
-        [Parameter()]
-        [System.string[]]
-        $excludedDomains,
+        $wallpaperDisplayLocation,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $proxyServer,
-
-        [Parameter()]
-        [System.Boolean]
-        $optInToDeviceIdSharing,
-
-        [Parameter()]
-        [System.string[]]
-        $excludeList, #not on https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfig-applevpnconfiguration?view=graph-rest-beta , but property is in the object
+        $wallpaperImage,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $server,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $customData,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $customKeyValueData,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $onDemandRules,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $targetedMobileApps,
+        $iosSingleSignOnExtension,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
@@ -343,65 +335,8 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String[]]
-        $AccessTokens,
-        
-        #latest updates
-        [Parameter()]
-        [System.UInt32]
-        $version,
+        $AccessTokens
 
-        [Parameter()]
-        [System.String]
-        $loginGroupOrDomain,
-
-        [Parameter()]
-        [System.String]
-        $role,
-
-        [Parameter()]
-        [System.String]
-        $realm,
-
-        [Parameter()]
-        [System.String]
-        $identifier,
-
-        [Parameter()]
-        [System.Boolean]
-        $enablePerApp,
-
-        [Parameter()]
-        [ValidateSet('notConfigured', 'appProxy', 'packetTunnel')]
-        [System.String]
-        $providerType,
-
-        [Parameter()]
-        [System.Boolean]
-        $disableOnDemandUserOverride,
-
-        [Parameter()]
-        [System.Boolean]
-        $disconnectOnIdle,
-
-        [Parameter()]
-        [System.UInt32]
-        $disconnectOnIdleTimerInSeconds,
-
-        [Parameter()]
-        [System.String]
-        $microsoftTunnelSiteId,
-
-        [Parameter()]
-        [System.String]
-        $cloudName,
-
-        [Parameter()]
-        [System.Boolean]
-        $strictEnforcement,
-
-        [Parameter()]
-        [System.String]
-        $userDomain
     )
 
     try
@@ -597,66 +532,57 @@ function Test-TargetResource
         $Description,
 
         [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $airPrintDestinations,
+
+        [Parameter()]
         [System.String]
-        $connectionName,
+        $assetTagTemplate,
 
         [Parameter()]
-        [ValidateSet('ciscoAnyConnect', 'pulseSecure', 'f5EdgeClient', 'dellSonicWallMobileConnect', 'checkPointCapsuleVpn', 'customVpn', 'ciscoIPSec', 'citrix', 'ciscoAnyConnectV2', 'paloAltoGlobalProtect', 'zscalerPrivateAccess', 'f5Access2018', 'citrixSso', 'paloAltoGlobalProtectV2', 'ikEv2', 'alwaysOn', 'microsoftTunnel', 'netMotionMobility', 'microsoftProtect')]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $contentFilterSettings,
+
+        [Parameter()]
         [System.String]
-        $connectionType,
+        $lockScreenFootnote,
 
         [Parameter()]
-        [System.Boolean]
-        $enableSplitTunneling,
-   
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenDockIcons,
+
         [Parameter()]
-        [ValidateSet('certificate', 'usernameAndPassword', 'sharedSecret', 'derivedCredential', 'azureAD')]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenPages,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridWidth,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridHeight,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $notificationSettings,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $singleSignOnSettings,
+
+        [Parameter()]
+        [ValidateSet("notConfigured", "lockScreen", "homeScreen", "lockAndHomeScreens")]
         [System.String]
-        $authenticationMethod,        
-        
-        [Parameter()]
-        [System.string[]]
-        $safariDomains,
-
-        [Parameter()]
-        [System.string[]]
-        $associatedDomains,
-
-        [Parameter()]
-        [System.string[]]
-        $excludedDomains,
+        $wallpaperDisplayLocation,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $proxyServer,
-
-        [Parameter()]
-        [System.Boolean]
-        $optInToDeviceIdSharing,
-
-        [Parameter()]
-        [System.string[]]
-        $excludeList, #not on https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfig-applevpnconfiguration?view=graph-rest-beta , but property is in the object
+        $wallpaperImage,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $server,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $customData,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $customKeyValueData,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $onDemandRules,
-
-        [Parameter()]
-        [Microsoft.Management.Infrastructure.CimInstance[]]
-        $targetedMobileApps,
+        $iosSingleSignOnExtension,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
@@ -694,64 +620,8 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String[]]
-        $AccessTokens,
+        $AccessTokens
 
-        [Parameter()]
-        [System.UInt32]
-        $version,
-
-        [Parameter()]
-        [System.String]
-        $loginGroupOrDomain,
-
-        [Parameter()]
-        [System.String]
-        $role,
-
-        [Parameter()]
-        [System.String]
-        $realm,
-
-        [Parameter()]
-        [System.String]
-        $identifier,
-
-        [Parameter()]
-        [System.Boolean]
-        $enablePerApp,
-
-        [Parameter()]
-        [ValidateSet('notConfigured', 'appProxy', 'packetTunnel')]
-        [System.String]
-        $providerType,
-
-        [Parameter()]
-        [System.Boolean]
-        $disableOnDemandUserOverride,
-
-        [Parameter()]
-        [System.Boolean]
-        $disconnectOnIdle,
-
-        [Parameter()]
-        [System.UInt32]
-        $disconnectOnIdleTimerInSeconds,
-
-        [Parameter()]
-        [System.String]
-        $microsoftTunnelSiteId,
-
-        [Parameter()]
-        [System.String]
-        $cloudName,
-
-        [Parameter()]
-        [System.Boolean]
-        $strictEnforcement,
-
-        [Parameter()]
-        [System.String]
-        $userDomain
     )
 
     #Ensure the proper dependencies are installed in the current environment.
@@ -937,93 +807,133 @@ function Export-TargetResource
                 }
             }
 
-            if ($null -ne $Results.server)
+            if ($null -ne $Results.airPrintDestinations)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.server `
-                    -CIMInstanceName 'MicrosoftGraphvpnServer' #MSFT_MicrosoftGraphVpnServer
+                    -ComplexObject $Results.airPrintDestinations `
+                    -CIMInstanceName 'MSFT_airPrintDestination'
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
-                    $Results.server = $complexTypeStringResult
+                    $Results.airPrintDestinations = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('server') | Out-Null
+                    $Results.Remove('airPrintDestinations') | Out-Null
                 }
             }
 
-            if ($null -ne $Results.onDemandRules)
+            if ($null -ne $Results.contentFilterSettings)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.onDemandRules `
-                    -CIMInstanceName 'MSFT_DeviceManagementConfigurationPolicyVpnOnDemandRule' #MSFT_DeviceManagementConfigurationPolicyVpnOnDemandRule
+                    -ComplexObject $Results.contentFilterSettings `
+                    -CIMInstanceName 'iosWebContentFilterSpecificWebsitesAccess'
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
-                    $Results.onDemandRules = $complexTypeStringResult
+                    $Results.contentFilterSettings = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('onDemandRules') | Out-Null
+                    $Results.Remove('contentFilterSettings') | Out-Null
                 }
             }
 
-            if ($null -ne $Results.proxyServer)
+            if ($null -ne $Results.homeScreenDockIcons)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.proxyServer `
-                    -CIMInstanceName 'MSFT_MicrosoftvpnProxyServer' 
+                    -ComplexObject $Results.homeScreenDockIcons `
+                    -CIMInstanceName 'MSFT_iosHomeScreenApp' 
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
-                    $Results.proxyServer = $complexTypeStringResult
+                    $Results.homeScreenDockIcons = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('proxyServer') | Out-Null
+                    $Results.Remove('homeScreenDockIcons') | Out-Null
                 }
             }
 
-            if ($null -ne $Results.customData)
+            if ($null -ne $Results.homeScreenPages)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.customData `
-                    -CIMInstanceName 'MSFT_CustomData' 
+                    -ComplexObject $Results.homeScreenPages `
+                    -CIMInstanceName 'MSFT_iosHomeScreenItem' 
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
-                    $Results.customData = $complexTypeStringResult
+                    $Results.homeScreenPages = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('customData') | Out-Null
+                    $Results.Remove('homeScreenPages') | Out-Null
                 }
             }
 
-            if ($null -ne $Results.customKeyValueData)
+            if ($null -ne $Results.wallpaperImage)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.customKeyValueData `
-                    -CIMInstanceName 'MSFT_customKeyValueData' 
+                    -ComplexObject $Results.wallpaperImage `
+                    -CIMInstanceName 'MSFT_mimeContent' 
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
-                    $Results.customKeyValueData = $complexTypeStringResult
+                    $Results.wallpaperImage = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('customKeyValueData') | Out-Null
+                    $Results.Remove('wallpaperImage') | Out-Null
                 }
             }
             
-            if ($null -ne $Results.targetedMobileApps)
+            if ($null -ne $Results.iosSingleSignOnExtension)
             {
+
+                $complexMapping = @(
+                @{
+                    Name = 'configurations'
+                    CimInstanceName = 'keyStringValuePair'
+                    IsRequired = $false
+                }
+
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.targetedMobileApps `
-                    -CIMInstanceName 'MSFT_targetedMobileApps' 
+                    -ComplexObject $Results.iosSingleSignOnExtension `
+                    -CIMInstanceName 'MSFT_iosSingleSignOnExtension' `
+                    -ComplexTypeMapping $complexMapping
+
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
-                    $Results.targetedMobileApps = $complexTypeStringResult
+                    $Results.iosSingleSignOnExtension = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('targetedMobileApps') | Out-Null
+                    $Results.Remove('iosSingleSignOnExtension') | Out-Null
+                }
+            }
+
+            if ($null -ne $Results.notificationSettings)
+            {
+                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
+                    -ComplexObject $Results.notificationSettings `
+                    -CIMInstanceName 'MSFT_iosNotificationSettings' 
+                if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
+                {
+                    $Results.notificationSettings = $complexTypeStringResult
+                }
+                else
+                {
+                    $Results.Remove('notificationSettings') | Out-Null
+                }
+            }
+
+            if ($null -ne $Results.singleSignOnSettings)
+            {
+                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
+                    -ComplexObject $Results.singleSignOnSettings `
+                    -CIMInstanceName 'MSFT_iosSingleSignOnSettings' 
+                if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
+                {
+                    $Results.singleSignOnSettings = $complexTypeStringResult
+                }
+                else
+                {
+                    $Results.Remove('singleSignOnSettings') | Out-Null
                 }
             }
 
@@ -1033,34 +943,44 @@ function Export-TargetResource
                 -Results $Results `
                 -Credential $Credential
 
-            if ($Results.server)
+            if ($Results.airPrintDestinations)
             {
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "server" -isCIMArray:$True
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "airPrintDestinations" -isCIMArray:$True
             }
 
-            if ($Results.onDemandRules)
+            if ($Results.contentFilterSettings)
             {
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "onDemandRules" -isCIMArray:$True
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "contentFilterSettings" -isCIMArray:$True
             }
 
-            if ($Results.proxyServer)
+            if ($Results.homeScreenDockIcons)
             {
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "proxyServer" -isCIMArray:$True
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "homeScreenDockIcons" -isCIMArray:$True
             }
 
-            if ($Results.customData)
+            if ($Results.homeScreenPages)
             {
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "customData" -isCIMArray:$True
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "homeScreenPages" -isCIMArray:$True
             }
 
-            if ($Results.customKeyValueData)
+            if ($Results.wallpaperImage)
             {
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "customKeyValueData" -isCIMArray:$True
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "wallpaperImage" -isCIMArray:$True
             }
 
-            if ($Results.targetedMobileApps)
+            if ($Results.iosSingleSignOnExtension)
             {
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "targetedMobileApps" -isCIMArray:$True
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "iosSingleSignOnExtension" -isCIMArray:$True
+            }
+
+            if ($Results.notificationSettings)
+            {
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "notificationSettings" -isCIMArray:$True
+            }
+
+            if ($Results.singleSignOnSettings)
+            {
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "singleSignOnSettings" -isCIMArray:$True
             }
 
             if ($Results.Assignments)
@@ -1167,6 +1087,40 @@ function Get-M365DSCAdditionalProperties
         return $null
     }
     return $results
+}
+
+function Convert-ComplexObjectToHashtableArray {
+    param (
+        [Parameter()]
+        [Object]$InputObject
+        
+    )
+
+    $resultArray = @()
+
+    foreach ($item in $InputObject) {
+        $hashTable = @{}
+        
+        foreach ($key in $item.Keys) {
+            $keyValue = $item.$key
+            if ($key -ne '@odata.type')
+            {
+                if ($keyValue.Count -gt 1)
+                {
+                    $keyValue = Convert-ComplexObjectToHashtableArray $keyValue
+                }
+                $hashTable.Add($key, $keyValue)
+            }
+        }
+        
+        # Add the hash table to the result array only if it contains non-null values
+        
+        if ($hashTable.Values.Where({ $null -ne $_ }).Count -gt 0) {
+            $resultArray += $hashTable
+        }
+    }
+
+    return ,$resultArray
 }
 
 Export-ModuleMember -Function *-TargetResource
