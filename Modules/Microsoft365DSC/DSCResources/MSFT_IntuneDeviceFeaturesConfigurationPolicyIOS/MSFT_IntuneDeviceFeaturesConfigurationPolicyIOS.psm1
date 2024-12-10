@@ -917,7 +917,6 @@ function Export-TargetResource
                     -ComplexObject $Results.iosSingleSignOnExtension `
                     -CIMInstanceName 'MSFT_iosSingleSignOnExtension' `
                     -ComplexTypeMapping $complexMapping
-
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
                     $Results.iosSingleSignOnExtension = $complexTypeStringResult
@@ -945,9 +944,17 @@ function Export-TargetResource
 
             if ($null -ne $Results.singleSignOnSettings)
             {
+                $complexMapping = @(
+                    @{
+                        Name = 'allowedAppsList'
+                        CimInstanceName = 'appListItem'
+                        IsRequired = $false
+                    }
+                )
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.singleSignOnSettings `
-                    -CIMInstanceName 'MSFT_iosSingleSignOnSettings' 
+                    -CIMInstanceName 'MSFT_iosSingleSignOnSettings' `
+                    -ComplexTypeMapping $complexMapping
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
                     $Results.singleSignOnSettings = $complexTypeStringResult
