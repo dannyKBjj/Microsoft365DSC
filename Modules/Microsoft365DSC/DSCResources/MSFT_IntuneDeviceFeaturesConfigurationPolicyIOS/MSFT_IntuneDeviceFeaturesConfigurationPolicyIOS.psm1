@@ -870,10 +870,9 @@ function Export-TargetResource
                 $complexMapping = @(
                     @{
                         Name = 'icons'
-                        CimInstanceName = 'iosHomeScreenItem'
+                        CimInstanceName = 'iosHomeScreenApp'
                         IsRequired = $false
                     }
-                    
                 )
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.homeScreenPages `
@@ -1133,16 +1132,19 @@ function Convert-ComplexObjectToHashtableArray {
             $keyValue = $item.$key
             if ($key -ne '@odata.type')
             {
-                if ($keyValue.Count -gt 1)
+                if ($keyValue -is [array])
                 {
-                    $keyValue = Convert-ComplexObjectToHashtableArray $keyValue
+                    $elementTypes = $keyValue | ForEach-Object { $_.GetType().Name }
+                    if($elementTypes -contains 'Dictionary`2') #another embedded complex type, not a string array
+                    {
+                        $keyValue = Convert-ComplexObjectToHashtableArray $keyValue #recurse the function
+                    }
                 }
                 $hashTable.Add($key, $keyValue)
             }
         }
         
-        # Add the hash table to the result array only if it contains non-null values
-        
+        # Add the hash table to the result array only if it contains non-null values       
         if ($hashTable.Values.Where({ $null -ne $_ }).Count -gt 0) {
             $resultArray += $hashTable
         }

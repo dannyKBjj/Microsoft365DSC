@@ -22,12 +22,15 @@ class MSFT_iosWebContentFilterBase
     [Write, Description("url.")] String url[];
     [Write, Description("bookmarkFolder.")] String bookmarkFolder[];
     [Write, Description("displayName.")] String displayName[];
+
 };
 [ClassVersion("1.0.0.0")]
 class MSFT_iosWebContentFilterSpecificWebsitesAccess 
 {
     [Write, Description("specificWebsitesOnly, embedded instance of iosWebContentFilterBase."), EmbeddedInstance("MSFT_iosWebContentFilterBase")] String specificWebsitesOnly[];
     [Write, Description("websiteList, embedded instance of iosWebContentFilterBase."), EmbeddedInstance("MSFT_iosWebContentFilterBase")] String websiteList[];
+    [Write, Description("allowedUrls.")] String allowedUrls[];
+    [Write, Description("blockedUrls.")] String blockedUrls[];
 };
 [ClassVersion("1.0.0.0")]
 class MSFT_iosHomeScreenApp
@@ -113,11 +116,11 @@ class MSFT_IntuneDeviceFeaturesConfigurationPolicyIOS : OMI_BaseResource
     [Write, Description("A footnote displayed on the login window and lock screen. Available in iOS 9.3.1 and later.")] String lockScreenFootnote;
     [Write, Description("A list of app and folders to appear on the Home Screen Dock. This collection can contain a maximum of 500 elements."), EmbeddedInstance("MSFT_iosHomeScreenApp")] String homeScreenDockIcons[];
     [Write, Description("A list of pages on the Home Screen. This collection can contain a maximum of 500 elements."), EmbeddedInstance("MSFT_iosHomeScreenItem")] String homeScreenPages[];  
-    [Write, Description("Gets or sets the number of columns to render when configuring iOS home screen layout settings. If this value is configured, homeScreenGridHeight must be configured as well.")] Int32 homeScreenGridWidth;
-    [Write, Description("Gets or sets the number of rows to render when configuring iOS home screen layout settings. If this value is configured, homeScreenGridWidth must be configured as well.")] Int32 homeScreenGridHeight;
+    [Write, Description("Gets or sets the number of columns to render when configuring iOS home screen layout settings. If this value is configured, homeScreenGridHeight must be configured as well.")] Uint32 homeScreenGridWidth;
+    [Write, Description("Gets or sets the number of rows to render when configuring iOS home screen layout settings. If this value is configured, homeScreenGridWidth must be configured as well.")] Uint32 homeScreenGridHeight;
     [Write, Description("Notification settings for each bundle id. Applicable to devices in supervised mode only (iOS 9.3 and later)."), EmbeddedInstance("MSFT_iosNotificationSettings")] String notificationSettings[];
-    [Write, Description("The Kerberos login settings that enable apps on receiving devices to authenticate smoothly."), EmbeddedInstance("MSFT_iosSingleSignOnSettings")] String singleSignOnSettings;  
+    [Write, Description("The Kerberos login settings that enable apps on receiving devices to authenticate smoothly."), EmbeddedInstance("MSFT_iosSingleSignOnSettings")] String singleSignOnSettings[];  
     [Write, Description("A wallpaper display location specifier. Possible values are: notConfigured, lockScreen, homeScreen, lockAndHomeScreens."), ValueMap{"notConfigured", "lockScreen", "homeScreen", "lockAndHomeScreens"}, Values{"notConfigured", "lockScreen", "homeScreen", "lockAndHomeScreens"}] String wallpaperDisplayLocation;
     [Write, Description("A wallpaper image must be in either PNG or JPEG format. It requires a supervised device with iOS 8 or later version."), EmbeddedInstance("MSFT_mimeContent")] String wallpaperImage[];
-    [Write, Description("Gets or sets a single sign-on extension profile."), EmbeddedInstance("MSFT_iosSingleSignOnExtension")] String iosSingleSignOnExtension;
+    [Write, Description("Gets or sets a single sign-on extension profile."), EmbeddedInstance("MSFT_iosSingleSignOnExtension")] String iosSingleSignOnExtension[];
 };
