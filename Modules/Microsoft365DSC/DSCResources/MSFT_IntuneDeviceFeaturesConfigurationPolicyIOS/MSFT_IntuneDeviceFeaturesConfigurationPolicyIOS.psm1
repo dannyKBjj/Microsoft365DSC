@@ -365,10 +365,10 @@ function Set-TargetResource
 
     $BoundParameters = Remove-M365DSCAuthenticationParameter -BoundParameters $PSBoundParameters
 
-    #proxy and server values need converting before new- / update- cmdlets will accept parameters
+    #some values need converting before new- / update- cmdlets will accept parameters
     #creating hashtables now for use later in both present/present and present/absent blocks
     $allTargetValues = Convert-M365DscHashtableToString -Hashtable $BoundParameters
-    
+<#   
     if ($allTargetValues -match '\bserver=\(\{([^\)]+)\}\)') 
     {
         $serverBlock = $matches[1]
@@ -382,17 +382,23 @@ function Set-TargetResource
             $serverHashtable[$key] = $value
         }
     }
-    if ($allTargetValues -match '\bproxyServer=\(\{([^\)]+)\}\)') 
+#>
+    if ($allTargetValues -match '\bcontentFilterSettings=\(\{(.*?)\}')
     {
-        $proxyBlock = $matches[1]
+        $contentFilterSettingsBlock = $matches[1]
     }
-
-    $proxyHashtable = @{}
-    $proxyBlock -split ";" | ForEach-Object {
+    $contentFilterSettingsHashtable = @{}
+    $contentFilterSettingsBlock -split ";" | ForEach-Object {
         if ($_ -match '^(.*?)=(.*)$') {
             $key = $matches[1].Trim()
             $value = $matches[2].Trim()
-            $proxyHashtable[$key] = $value
+            #$contentFilterSettingsHashtable[$key] = $value
+            if( (($key -eq 'blockedUrls') -or ($key -eq 'allowedUrls')) -and ("" -ne $value) ) #microsoft.graph.iosWebContentFilterAutoFilter
+            {
+            $array = @()
+            $array = $value -split " "
+            $contentFilterSettingsHashtable[$key] = $array
+            }
         }
     }
 
@@ -423,15 +429,10 @@ function Set-TargetResource
             }
         }
 
-        if ($AdditionalProperties.server)
+        if ($AdditionalProperties.contentFilterSettings)
         {
-            $AdditionalProperties.Remove('server') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
-            $AdditionalProperties.add('server',$serverHashtable) #replaced with the hashtable we created earlier
-        }
-        if ($AdditionalProperties.proxyServer)
-        {
-            $AdditionalProperties.Remove('proxyServer') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
-            $AdditionalProperties.add('proxyServer',$proxyHashtable) #replaced with the hashtable we created earlier
+            $AdditionalProperties.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $AdditionalProperties.add('contentFilterSettings',$contentFilterSettingsHashtable) #replaced with the hashtable we created earlier
         }
 
         $CreateParameters.add('AdditionalProperties', $AdditionalProperties)
@@ -456,7 +457,7 @@ function Set-TargetResource
         $UpdateParameters = ([Hashtable]$BoundParameters).clone()
         $UpdateParameters = Rename-M365DSCCimInstanceParameter -Properties $UpdateParameters
         $AdditionalProperties = Get-M365DSCAdditionalProperties -Properties ($UpdateParameters)
-
+ 
         foreach ($key in $AdditionalProperties.keys)
         {
             if ($key -ne '@odata.type')
@@ -479,17 +480,13 @@ function Set-TargetResource
         if ($AdditionalProperties)
         {
             
-            if ($AdditionalProperties.server)
+            if ($AdditionalProperties.contentFilterSettings)
             {
-                $AdditionalProperties.Remove('server') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
-                $AdditionalProperties.add('server',$serverHashtable) #replaced with the hashtable we created earlier
+                $AdditionalProperties.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+                $AdditionalProperties.add('contentFilterSettings',$contentFilterSettingsHashtable) #replaced with the hashtable we created earlier
             }
-            if ($AdditionalProperties.proxyServer)
-            {
-                $AdditionalProperties.Remove('proxyServer') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
-                $AdditionalProperties.add('proxyServer',$proxyHashtable) #replaced with the hashtable we created earlier
-            }
-            
+$contentFilterSettingsHashtable | out-file "C:\dsc-IOSdevFeat\contentFilterSettingsHashtable.txt"
+$AdditionalProperties | out-file "C:\dsc-IOSdevFeat\additionalproperties2.txt"
             #add the additional properties to the updateparameters
             $UpdateParameters.add('AdditionalProperties', $AdditionalProperties)
         }
