@@ -161,20 +161,6 @@ function Get-TargetResource
 
         Write-Verbose -Message "An Intune VPN Policy for iOS with id {$id} and DisplayName {$DisplayName} was found"
 
-        $complexAirPrintDestinations = @()
-        foreach ($item in $getValue.AdditionalProperties.airPrintDestinations)
-        {
-            $hashTable = @{}
-            $hashTable.Add('ipAddress', $item.ipAddress)
-            $hashTable.Add('resourcePath', $item.resourcePath)
-            $hashTable.Add('port', $item.port)
-            $hashTable.Add('forceTls', $item.forceTls)
-            if ($htPrintDestinations.values.Where({$null -ne $_}).count -gt 0)
-            {
-                $complexAirPrintDestinations += $hashTable
-            }
-        }
-
         $results = @{
             #region resource generator code
             Id                       = $getValue.Id
@@ -188,7 +174,7 @@ function Get-TargetResource
             CertificateThumbprint    = $CertificateThumbprint
             Managedidentity          = $ManagedIdentity.IsPresent
             AccessTokens             = $AccessTokens
-            airPrintDestinations     = $complexAirPrintDestinations #Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.airPrintDestinations
+            airPrintDestinations     = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.airPrintDestinations
             assetTagTemplate         = $getValue.AdditionalProperties.assetTagTemplate
             contentFilterSettings    = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.contentFilterSettings
             lockScreenFootnote       = $getValue.AdditionalProperties.lockScreenFootnote
@@ -365,24 +351,11 @@ function Set-TargetResource
 
     $BoundParameters = Remove-M365DSCAuthenticationParameter -BoundParameters $PSBoundParameters
 
-    #some values need converting before new- / update- cmdlets will accept parameters
-    #creating hashtables now for use later in both present/present and present/absent blocks
     $allTargetValues = Convert-M365DscHashtableToString -Hashtable $BoundParameters
-<#   
-    if ($allTargetValues -match '\bserver=\(\{([^\)]+)\}\)') 
-    {
-        $serverBlock = $matches[1]
-    }
 
-    $serverHashtable = @{}
-    $serverBlock -split ";" | ForEach-Object {
-        if ($_ -match '^(.*?)=(.*)$') {
-            $key = $matches[1].Trim()
-            $value = $matches[2].Trim()
-            $serverHashtable[$key] = $value
-        }
-    }
-#>
+    <#desired parameters do not come back in a format that New/Update-MgBetaDeviceManagementDeviceConfiguration can accept,
+    therefore is is necessary to recontruct the contentFilterSettings in the correct format for use in the update/create 
+    blocks later on#>
     if ($allTargetValues -match '\bcontentFilterSettings=\(\{(.*?)\}')
     {
         $contentFilterSettingsBlock = $matches[1]
@@ -392,13 +365,13 @@ function Set-TargetResource
         if ($_ -match '^(.*?)=(.*)$') {
             $key = $matches[1].Trim()
             $value = $matches[2].Trim()
-            #$contentFilterSettingsHashtable[$key] = $value
-            if( (($key -eq 'blockedUrls') -or ($key -eq 'allowedUrls')) -and ("" -ne $value) ) #microsoft.graph.iosWebContentFilterAutoFilter
-            {
-            $array = @()
-            $array = $value -split " "
-            $contentFilterSettingsHashtable[$key] = $array
-            }
+                if( (($key -eq 'blockedUrls') -or ($key -eq 'allowedUrls')) -and ("" -ne $value) )
+                {
+                    $array = @()
+                    $array = $value -split " "
+                    $contentFilterSettingsHashtable.Add('@odata.type','#microsoft.graph.iosWebContentFilterAutoFilter') #need to specify datatype as contentFilterSettings accepts 2 different types
+                    $contentFilterSettingsHashtable[$key] = $array
+                }
         }
     }
 
@@ -478,15 +451,12 @@ function Set-TargetResource
         }
 
         if ($AdditionalProperties)
-        {
-            
+        {           
             if ($AdditionalProperties.contentFilterSettings)
             {
                 $AdditionalProperties.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
                 $AdditionalProperties.add('contentFilterSettings',$contentFilterSettingsHashtable) #replaced with the hashtable we created earlier
             }
-$contentFilterSettingsHashtable | out-file "C:\dsc-IOSdevFeat\contentFilterSettingsHashtable.txt"
-$AdditionalProperties | out-file "C:\dsc-IOSdevFeat\additionalproperties2.txt"
             #add the additional properties to the updateparameters
             $UpdateParameters.add('AdditionalProperties', $AdditionalProperties)
         }
@@ -650,6 +620,7 @@ function Test-TargetResource
     {
         $source = $PSBoundParameters.$key
         $target = $CurrentValues.$key
+
         if ($source.GetType().Name -like '*CimInstance*')
         {
             $testResult = Compare-M365DSCComplexObject `
@@ -808,7 +779,7 @@ function Export-TargetResource
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.airPrintDestinations `
-                    -CIMInstanceName 'MSFT_airPrintDestination'
+                    -CIMInstanceName 'MSFT_airPrintDestination' 
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
                     $Results.airPrintDestinations = $complexTypeStringResult
@@ -835,7 +806,7 @@ function Export-TargetResource
                 )
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.contentFilterSettings `
-                    -CIMInstanceName 'iosWebContentFilterSpecificWebsitesAccess' `
+                    -CIMInstanceName 'MSFT_iosWebContentFilterSpecificWebsitesAccess' `
                     -ComplexTypeMapping $complexMapping
                 if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
                 {
