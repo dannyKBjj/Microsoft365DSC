@@ -161,6 +161,8 @@ function Get-TargetResource
 
         Write-Verbose -Message "An Intune VPN Policy for iOS with id {$id} and DisplayName {$DisplayName} was found"
 
+
+
         $results = @{
             #region resource generator code
             Id                       = $getValue.Id
@@ -187,7 +189,6 @@ function Get-TargetResource
             wallpaperDisplayLocation = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.wallpaperDisplayLocation 
             wallpaperImage           = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.wallpaperImage
             iosSingleSignOnExtension = Convert-ComplexObjectToHashtableArray $getValue.AdditionalProperties.iosSingleSignOnExtension
-
         }
                                           
         $assignmentsValues = Get-MgBetaDeviceManagementDeviceConfigurationAssignment -DeviceConfigurationId $Results.Id
@@ -348,32 +349,9 @@ function Set-TargetResource
     #endregion
 
     $currentInstance = Get-TargetResource @PSBoundParameters
-
     $BoundParameters = Remove-M365DSCAuthenticationParameter -BoundParameters $PSBoundParameters
 
-    $allTargetValues = Convert-M365DscHashtableToString -Hashtable $BoundParameters
 
-    <#desired parameters do not come back in a format that New/Update-MgBetaDeviceManagementDeviceConfiguration can accept,
-    therefore is is necessary to recontruct the contentFilterSettings in the correct format for use in the update/create 
-    blocks later on#>
-    if ($allTargetValues -match '\bcontentFilterSettings=\(\{(.*?)\}')
-    {
-        $contentFilterSettingsBlock = $matches[1]
-    }
-    $contentFilterSettingsHashtable = @{}
-    $contentFilterSettingsBlock -split ";" | ForEach-Object {
-        if ($_ -match '^(.*?)=(.*)$') {
-            $key = $matches[1].Trim()
-            $value = $matches[2].Trim()
-                if( (($key -eq 'blockedUrls') -or ($key -eq 'allowedUrls')) -and ("" -ne $value) )
-                {
-                    $array = @()
-                    $array = $value -split " "
-                    $contentFilterSettingsHashtable.Add('@odata.type','#microsoft.graph.iosWebContentFilterAutoFilter') #need to specify datatype as contentFilterSettings accepts 2 different types
-                    $contentFilterSettingsHashtable[$key] = $array
-                }
-        }
-    }
 
     if ($Ensure -eq 'Present' -and $currentInstance.Ensure -eq 'Absent')
     {
@@ -381,16 +359,6 @@ function Set-TargetResource
         $BoundParameters.Remove('Assignments') | Out-Null
         $CreateParameters = ([Hashtable]$BoundParameters).clone()
         $CreateParameters = Rename-M365DSCCimInstanceParameter -Properties $CreateParameters
-        $AdditionalProperties = Get-M365DSCAdditionalProperties -Properties ($CreateParameters)
-
-        foreach ($key in $AdditionalProperties.keys)
-        {
-            if ($key -ne '@odata.type')
-            {
-                $keyName = $key.substring(0, 1).ToUpper() + $key.substring(1, $key.length - 1)
-                $CreateParameters.remove($keyName)
-            }
-        }
 
         $CreateParameters.Remove('Id') | Out-Null
 
@@ -400,12 +368,6 @@ function Set-TargetResource
             {
                 $CreateParameters[$key] = Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $CreateParameters[$key]
             }
-        }
-
-        if ($AdditionalProperties.contentFilterSettings)
-        {
-            $AdditionalProperties.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
-            $AdditionalProperties.add('contentFilterSettings',$contentFilterSettingsHashtable) #replaced with the hashtable we created earlier
         }
 
         $CreateParameters.add('AdditionalProperties', $AdditionalProperties)
@@ -425,45 +387,66 @@ function Set-TargetResource
     elseif ($Ensure -eq 'Present' -and $currentInstance.Ensure -eq 'Present')
     {
         Write-Verbose -Message "Updating {$DisplayName}"
-
         $BoundParameters.Remove('Assignments') | Out-Null
+
         $UpdateParameters = ([Hashtable]$BoundParameters).clone()
         $UpdateParameters = Rename-M365DSCCimInstanceParameter -Properties $UpdateParameters
-        $AdditionalProperties = Get-M365DSCAdditionalProperties -Properties ($UpdateParameters)
- 
-        foreach ($key in $AdditionalProperties.keys)
-        {
-            if ($key -ne '@odata.type')
-            {
-                $keyName = $key.substring(0, 1).ToUpper() + $key.substring(1, $key.length - 1)
-                $UpdateParameters.remove($keyName)
-            }
-        }
 
         $UpdateParameters.Remove('Id') | Out-Null
 
-        foreach ($key in ($UpdateParameters.clone()).Keys)
+        $keys = (([Hashtable]$UpdateParameters).clone()).Keys
+        foreach ($key in $keys)
         {
-            if ($UpdateParameters[$key].getType().Fullname -like '*CimInstance*')
+            if ($null -ne $UpdateParameters.$key -and $UpdateParameters.$key.getType().Name -like '*cimInstance*')
             {
-                $UpdateParameters[$key] = Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $UpdateParameters[$key]
+                $UpdateParameters.$key = Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $UpdateParameters.$key
             }
         }
 
-        if ($AdditionalProperties)
-        {           
-            if ($AdditionalProperties.contentFilterSettings)
-            {
-                $AdditionalProperties.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
-                $AdditionalProperties.add('contentFilterSettings',$contentFilterSettingsHashtable) #replaced with the hashtable we created earlier
-            }
-            #add the additional properties to the updateparameters
-            $UpdateParameters.add('AdditionalProperties', $AdditionalProperties)
+        if ($UpdateParameters.iosSingleSignOnExtension.count -gt 0)
+        {
+            $tempHashtable = Convert-ComplexSchema $UpdateParameters.iosSingleSignOnExtension
+            $UpdateParameters.Remove('iosSingleSignOnExtension') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $UpdateParameters.add('iosSingleSignOnExtension',$tempHashtable) #replaced with the hashtable we created earlier
         }
+
+        if ($UpdateParameters.wallpaperImage.count -gt 0)
+        {
+            $tempHashtable = Convert-ComplexSchema $UpdateParameters.wallpaperImage
+            $UpdateParameters.Remove('wallpaperImage') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $UpdateParameters.add('wallpaperImage',$tempHashtable) #replaced with the hashtable we created earlier
+        }
+
+        if ($UpdateParameters.contentFilterSettings.count -gt 0)
+        {
+            $tempHashtable = Convert-ComplexSchema $UpdateParameters.contentFilterSettings
+            $UpdateParameters.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $UpdateParameters.add('contentFilterSettings',$tempHashtable) #replaced with the hashtable we created earlier
+        }
+
+        if ($UpdateParameters.singleSignOnSettings.count -gt 0)
+        {
+            $tempHashtable = Convert-ComplexSchema $UpdateParameters.singleSignOnSettings
+            $UpdateParameters.Remove('singleSignOnSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $UpdateParameters.add('singleSignOnSettings',$tempHashtable) #replaced with the hashtable we created earlier
+        }
+$UpdateParameters | out-file "C:\dsc-IOSdevFeat\UpdateParameters-BEFORE.txt"
+        if ($UpdateParameters.homeScreenPages.count -gt 0)
+        {
+$UpdateParameters.homeScreenPages |  out-file "C:\dsc-IOSdevFeat\homeScreenPages.txt"
+            $tempHashtable = Convert-ComplexSchema $UpdateParameters.homeScreenPages
+            $UpdateParameters.Remove('homeScreenPages') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+$tempHashtable | out-file "C:\dsc-IOSdevFeat\tempHASH.txt"
+            #$tempHashtable.Add('@odata.type', '#microsoft.graph.iosHomeScreenApp')
+            $UpdateParameters.add('homeScreenPages',$tempHashtable) #replaced with the hashtable we created earlier
+        }
+$UpdateParameters | out-file "C:\dsc-IOSdevFeat\UpdateParameters-AFTER.txt"
+        $UpdateParameters.Add('@odata.type', '#microsoft.graph.iosDeviceFeaturesConfiguration')
 
         #region resource generator code
-        Update-MgBetaDeviceManagementDeviceConfiguration @UpdateParameters `
-            -DeviceConfigurationId $currentInstance.Id
+        Update-MgBetaDeviceManagementDeviceConfiguration  `
+            -DeviceConfigurationId $currentInstance.Id `
+            -BodyParameter $UpdateParameters
         $assignmentsHash = ConvertTo-IntunePolicyAssignment -IncludeDeviceFilter:$true -Assignments $Assignments
         Update-DeviceConfigurationPolicyAssignment -DeviceConfigurationPolicyId $currentInstance.id `
             -Targets $assignmentsHash `
@@ -1119,6 +1102,26 @@ function Convert-ComplexObjectToHashtableArray {
     }
 
     return ,$resultArray
+}
+
+function Convert-ComplexSchema {
+    param (
+        [Parameter()]
+        [Object]$InputObject
+        
+    )
+    $Block = $InputObject
+
+    $hashtable = @{}
+    $block -split ";" | ForEach-Object {
+        if ($_ -match '^(.*?)=(.*)$') {
+            $key = $matches[1].Trim()
+            $value = $matches[2].Trim()
+            $hashtable[$key] = $value
+        }
+    }
+
+    return ,$hashtable
 }
 
 Export-ModuleMember -Function *-TargetResource
