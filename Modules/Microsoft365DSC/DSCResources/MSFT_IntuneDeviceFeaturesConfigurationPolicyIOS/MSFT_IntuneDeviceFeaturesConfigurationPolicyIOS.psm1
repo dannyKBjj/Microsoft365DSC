@@ -200,7 +200,7 @@ function Get-TargetResource
                                 -Assignments ($assignmentsValues)
         }
         $results.Add('Assignments', $assignmentResult)
-
+        Write-Verbose -Message "Returning {$DisplayName}"
         return [System.Collections.Hashtable] $results
     }
     catch
@@ -214,7 +214,7 @@ function Get-TargetResource
         return $nullResult
     }
 }
-
+<#
 function Set-TargetResource
 {
     [CmdletBinding()]
@@ -460,6 +460,351 @@ $UpdateParameters | out-file "C:\dsc-IOSdevFeat\UpdateParameters-AFTER.txt"
         Remove-MgBetaDeviceManagementDeviceConfiguration -DeviceConfigurationId $currentInstance.Id
         #endregion
     }
+}#>
+
+function Set-TargetResource
+{
+    [CmdletBinding()]
+    param
+    (
+        #region resource generator code
+        [Parameter()]
+        [System.String]
+        $Id,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DisplayName,
+
+        [Parameter()]
+        [System.String]
+        $Description,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $airPrintDestinations,
+
+        [Parameter()]
+        [System.String]
+        $assetTagTemplate,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $contentFilterSettings,
+
+        [Parameter()]
+        [System.String]
+        $lockScreenFootnote,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenDockIcons,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $homeScreenPages,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridWidth,
+
+        [Parameter()]
+        [System.Int32]
+        $homeScreenGridHeight,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $notificationSettings,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $singleSignOnSettings,
+
+        [Parameter()]
+        [ValidateSet("notConfigured", "lockScreen", "homeScreen", "lockAndHomeScreens")]
+        [System.String]
+        $wallpaperDisplayLocation,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $wallpaperImage,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $iosSingleSignOnExtension,
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $Assignments,
+        #endregion
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('Absent', 'Present')]
+        $Ensure = 'Present',
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $Credential,
+
+        [Parameter()]
+        [System.String]
+        $ApplicationId,
+
+        [Parameter()]
+        [System.String]
+        $TenantId,
+
+        [Parameter()]
+        [System.Management.Automation.PSCredential]
+        $ApplicationSecret,
+
+        [Parameter()]
+        [System.String]
+        $CertificateThumbprint,
+
+        [Parameter()]
+        [Switch]
+        $ManagedIdentity,
+
+        [Parameter()]
+        [System.String[]]
+        $AccessTokens
+
+    )
+
+    try
+    {
+        $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
+            -InboundParameters $PSBoundParameters
+    }
+    catch
+    {
+        Write-Verbose -Message $_
+    }
+
+    #Ensure the proper dependencies are installed in the current environment.
+    Confirm-M365DSCDependencies
+
+    #region Telemetry
+    $ResourceName = $MyInvocation.MyCommand.ModuleName.Replace('MSFT_', '')
+    $CommandName = $MyInvocation.MyCommand
+    $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
+        -CommandName $CommandName `
+        -Parameters $PSBoundParameters
+    Add-M365DSCTelemetryEvent -Data $data
+    #endregion
+
+    $currentInstance = Get-TargetResource @PSBoundParameters
+    $BoundParameters = Remove-M365DSCAuthenticationParameter -BoundParameters $PSBoundParameters
+
+    $allTargetValues = Convert-M365DscHashtableToString -Hashtable $BoundParameters
+
+    <#desired parameters do not come back in a format that New/Update-MgBetaDeviceManagementDeviceConfiguration can accept,
+    therefore is is necessary to recontruct the contentFilterSettings in the correct format for use in the update/create 
+    blocks later on#>
+    if ($allTargetValues -match '\bcontentFilterSettings=\(\{(.*?)\}')
+    {
+        $contentFilterSettingsBlock = $matches[1]
+        $contentFilterSettingsHashtable = @{}
+        $contentFilterSettingsBlock -split ";" | ForEach-Object `
+        {
+            if ($_ -match '^(.*?)=(.*)$') 
+            {
+                $key = $matches[1].Trim()
+                $value = $matches[2].Trim()
+                    if( (($key -eq 'blockedUrls') -or ($key -eq 'allowedUrls')) -and ("" -ne $value) )
+                    {
+                        $array = @()
+                        $array = $value -split " "
+                        $contentFilterSettingsHashtable.Add('@odata.type','#microsoft.graph.iosWebContentFilterAutoFilter') #need to specify datatype as contentFilterSettings accepts 2 different types
+                        $contentFilterSettingsHashtable[$key] = $array
+                    }
+            }
+        }
+    }
+
+
+    if ($allTargetValues -match '\biosSingleSignOnExtension=\(\{([^\)]+)\}\)') 
+    {
+        $iosSingleSignOnExtensionBlock = $matches[1]
+        $iosSingleSignOnExtensionHashtable = @{}
+        $iosSingleSignOnExtensionBlock -split ";" | ForEach-Object 
+        {
+            if ($_ -match '^(.*?)=(.*)$') 
+            {
+                $key = $matches[1].Trim()
+                $value = $matches[2].Trim()
+                $iosSingleSignOnExtensionHashtable[$key] = $value
+            }
+        }
+    }
+
+    if ($allTargetValues -match '\bwallpaperImage=\(\{([^\)]+)\}\)') 
+    {
+        $iosSingleSignOnExtensionBlock = $matches[1]
+        $wallpaperImageHashtable = @{}
+        $wallpaperImageBlock -split ";" | ForEach-Object 
+        {
+           if ($_ -match '^(.*?)=(.*)$') 
+           {
+               $key = $matches[1].Trim()
+               $value = $matches[2].Trim()
+               $wallpaperImageHashtable[$key] = $value
+           }
+        }
+    }
+
+    if ($allTargetValues -match '\bhomeScreenPages=\(\{([^\)]+)\}\)') 
+    {
+        $homeScreenPagesBlock = $matches[1]
+        $homeScreenPagesHashtable = @{}
+        $homeScreenPagesBlock -split ";" | ForEach-Object 
+        {
+            if ($_ -match '^(.*?)=(.*)$') 
+            {
+                $key = $matches[1].Trim()
+                $value = $matches[2].Trim()
+                $homeScreenPagesHashtable[$key] = $value
+            }
+        }
+    }
+
+    if ($Ensure -eq 'Present' -and $currentInstance.Ensure -eq 'Absent')
+    {
+        Write-Verbose -Message "Creating {$DisplayName}"
+        $BoundParameters.Remove('Assignments') | Out-Null
+        $CreateParameters = ([Hashtable]$BoundParameters).clone()
+        $CreateParameters = Rename-M365DSCCimInstanceParameter -Properties $CreateParameters
+        $AdditionalProperties = Get-M365DSCAdditionalProperties -Properties ($CreateParameters)
+
+        foreach ($key in $AdditionalProperties.keys)
+        {
+            if ($key -ne '@odata.type')
+            {
+                $keyName = $key.substring(0, 1).ToUpper() + $key.substring(1, $key.length - 1)
+                $CreateParameters.remove($keyName)
+            }
+        }
+
+        $CreateParameters.Remove('Id') | Out-Null
+
+        foreach ($key in ($CreateParameters.clone()).Keys)
+        {
+            if ($CreateParameters[$key].getType().Fullname -like '*CimInstance*')
+            {
+                $CreateParameters[$key] = Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $CreateParameters[$key]
+            }
+        }
+
+        if ($AdditionalProperties.contentFilterSettings)
+        {
+            $AdditionalProperties.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $AdditionalProperties.add('contentFilterSettings',$contentFilterSettingsHashtable) #replaced with the hashtable we created earlier
+        }
+
+        if ($AdditionalProperties.iosSingleSignOnExtension)
+        {
+            $AdditionalProperties.Remove('iosSingleSignOnExtension') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $AdditionalProperties.add('iosSingleSignOnExtension',$iosSingleSignOnExtensionHashtable) #replaced with the hashtable we created earlier
+        }
+
+        if ($AdditionalProperties.wallpaperImage)
+        {
+            $AdditionalProperties.Remove('wallpaperImage') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $AdditionalProperties.add('wallpaperImage',$wallpaperImageHashtable) #replaced with the hashtable we created earlier
+        }
+
+        if ($AdditionalProperties.homeScreenPages)
+        {
+            $AdditionalProperties.Remove('homeScreenPages') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+            $AdditionalProperties.add('homeScreenPages',$homeScreenPagesHashtable) #replaced with the hashtable we created earlier
+        }
+
+        $CreateParameters.add('AdditionalProperties', $AdditionalProperties)
+           
+        #region resource generator code
+        $policy = New-MgBetaDeviceManagementDeviceConfiguration @CreateParameters
+        $assignmentsHash = ConvertTo-IntunePolicyAssignment -IncludeDeviceFilter:$true -Assignments $Assignments
+
+        if ($policy.id)
+        {
+            Update-DeviceConfigurationPolicyAssignment -DeviceConfigurationPolicyId $policy.id `
+                -Targets $assignmentsHash `
+                -Repository 'deviceManagement/deviceConfigurations'
+        }
+        #endregion
+    }
+    elseif ($Ensure -eq 'Present' -and $currentInstance.Ensure -eq 'Present')
+    {
+        Write-Verbose -Message "Updating {$DisplayName}"
+
+        $BoundParameters.Remove('Assignments') | Out-Null
+        $UpdateParameters = ([Hashtable]$BoundParameters).clone()
+        $UpdateParameters = Rename-M365DSCCimInstanceParameter -Properties $UpdateParameters
+        $AdditionalProperties = Get-M365DSCAdditionalProperties -Properties ($UpdateParameters)
+ 
+        foreach ($key in $AdditionalProperties.keys)
+        {
+            if ($key -ne '@odata.type')
+            {
+                $keyName = $key.substring(0, 1).ToUpper() + $key.substring(1, $key.length - 1)
+                $UpdateParameters.remove($keyName)
+            }
+        }
+
+        $UpdateParameters.Remove('Id') | Out-Null
+
+        foreach ($key in ($UpdateParameters.clone()).Keys)
+        {
+            if ($UpdateParameters[$key].getType().Fullname -like '*CimInstance*')
+            {
+                $UpdateParameters[$key] = Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $UpdateParameters[$key]
+            }
+        }
+
+        if ($AdditionalProperties)
+        {           
+            if ($AdditionalProperties.contentFilterSettings)
+            {
+                $AdditionalProperties.Remove('contentFilterSettings') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+                $AdditionalProperties.add('contentFilterSettings',$contentFilterSettingsHashtable) #replaced with the hashtable we created earlier
+            }
+            if ($AdditionalProperties.iosSingleSignOnExtension)
+            {
+                $AdditionalProperties.Remove('iosSingleSignOnExtension') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+                $AdditionalProperties.add('iosSingleSignOnExtension',$iosSingleSignOnExtensionHashtable) #replaced with the hashtable we created earlier
+            }
+            if ($AdditionalProperties.wallpaperImage)
+            {
+                $AdditionalProperties.Remove('wallpaperImage') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+                $AdditionalProperties.add('wallpaperImage',$wallpaperImageHashtable) #replaced with the hashtable we created earlier
+            }
+            if ($AdditionalProperties.homeScreenPages)
+            {
+                $AdditionalProperties.Remove('homeScreenPages') #this is not in a format Update-MgBetaDeviceManagementDeviceConfiguration will accept
+                #$AdditionalProperties.add('homeScreenPages',$homeScreenPagesHashtable) #replaced with the hashtable we created earlier
+            }
+            #add the additional properties to the updateparameters
+            $UpdateParameters.add('AdditionalProperties', $AdditionalProperties)
+        }
+
+        #region resource generator code
+        Update-MgBetaDeviceManagementDeviceConfiguration @UpdateParameters `
+            -DeviceConfigurationId $currentInstance.Id
+        $assignmentsHash = ConvertTo-IntunePolicyAssignment -IncludeDeviceFilter:$true -Assignments $Assignments
+        Update-DeviceConfigurationPolicyAssignment -DeviceConfigurationPolicyId $currentInstance.id `
+            -Targets $assignmentsHash `
+            -Repository 'deviceManagement/deviceConfigurations'
+        #endregion
+    }
+    elseif ($Ensure -eq 'Absent' -and $currentInstance.Ensure -eq 'Present')
+    {
+        Write-Verbose -Message "Removing {$DisplayName}"
+        #region resource generator code
+        Remove-MgBetaDeviceManagementDeviceConfiguration -DeviceConfigurationId $currentInstance.Id
+        #endregion
+    }
 }
 
 function Test-TargetResource
@@ -683,7 +1028,7 @@ function Export-TargetResource
         [System.String[]]
         $AccessTokens
     )
-
+Write-Verbose -Message "DEBUG Export is running"
     $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
         -InboundParameters $PSBoundParameters
 
@@ -698,10 +1043,10 @@ function Export-TargetResource
         -Parameters $PSBoundParameters
     Add-M365DSCTelemetryEvent -Data $data
     #endregion
-
+Write-Verbose -Message "DEBUG telemetry done"
     try
     {
-
+Write-Verbose -Message "DEBUG Get-MgBetaDeviceManagementDeviceConfiguration"
         #region resource generator code
         [array]$getValue = Get-MgBetaDeviceManagementDeviceConfiguration -Filter $Filter -All `
             -ErrorAction Stop | Where-Object `
@@ -757,7 +1102,7 @@ function Export-TargetResource
                     $Results.Remove('Assignments') | Out-Null
                 }
             }
-
+            
             if ($null -ne $Results.airPrintDestinations)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
@@ -772,7 +1117,7 @@ function Export-TargetResource
                     $Results.Remove('airPrintDestinations') | Out-Null
                 }
             }
-
+            
             if ($null -ne $Results.contentFilterSettings)
             {
                 $complexMapping = @(
@@ -800,7 +1145,7 @@ function Export-TargetResource
                     $Results.Remove('contentFilterSettings') | Out-Null
                 }
             }
-
+            
             if ($null -ne $Results.homeScreenDockIcons)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
@@ -925,12 +1270,12 @@ function Export-TargetResource
             {
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "airPrintDestinations" -isCIMArray:$True
             }
-
+            
             if ($Results.contentFilterSettings)
             {
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "contentFilterSettings" -isCIMArray:$True
             }
-
+            
             if ($Results.homeScreenDockIcons)
             {
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "homeScreenDockIcons" -isCIMArray:$True
@@ -1107,10 +1452,10 @@ function Convert-ComplexObjectToHashtableArray {
 function Convert-ComplexSchema {
     param (
         [Parameter()]
-        [Object]$InputObject
+        [System.String]$inputString
         
     )
-    $Block = $InputObject
+    $Block = $inputString
 
     $hashtable = @{}
     $block -split ";" | ForEach-Object {
