@@ -15,7 +15,26 @@ function Get-TargetResource
         [Parameter()]
         [System.Boolean]
         $DeviceThreatProtectionEnabled,
+#mine
+        [Parameter()]
+        [System.String]
+        $requiredPasswordComplexity,
 
+        [Parameter()]
+        [System.Boolean]
+        $securityBlockDeviceAdministratorManagedDevices,
+
+        [Parameter()]
+        [System.String[]]
+        $restrictedApps,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')]
+        $workProfilePasswordRequiredType,
+
+
+#end mine
         [Parameter()]
         [System.String]
         [ValidateSet('unavailable', 'secured', 'low', 'medium', 'high', 'notSet')]
@@ -156,6 +175,10 @@ function Get-TargetResource
 
         Write-Verbose -Message "Found Intune Android Device Owner Device Compliance Policy with displayName {$DisplayName}"
         $results = @{
+            requiredPasswordComplexity                         = $devicePolicy.AdditionalProperties.requiredPasswordComplexity
+            securityBlockDeviceAdministratorManagedDevices     = $devicePolicy.AdditionalProperties.securityBlockDeviceAdministratorManagedDevices
+            restrictedApps                                     = $devicePolicy.AdditionalProperties.restrictedApps
+
             DisplayName                                        = $devicePolicy.DisplayName
             Description                                        = $devicePolicy.Description
             DeviceThreatProtectionEnabled                      = $devicePolicy.AdditionalProperties.deviceThreatProtectionEnabled
