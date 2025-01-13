@@ -240,20 +240,16 @@ function Get-TargetResource
 
         Write-Verbose -Message "Found Intune Android Work Profile Device Compliance Policy with displayName {$DisplayName}"
 
-                #scheduledActionsForRule needs processing before we can interact with it
-        $psCustomObject = $devicePolicy.ScheduledActionsForRule | convertTo-JSON | ConvertFrom-JSON
-        $scheduledActionsForRule = @{}
-        $psCustomObject.PsObject.Properties | ForEach-Object {
-            $scheduledActionsForRule[$_.Name] = $_.Value
-        }
-        
-        $scheduledActionsForRule.Remove('AdditionalProperties')
-        $scheduledActionsForRule.Remove('Id')
-
+        #scheduledActionsForRule needs processing before we can interact with it
+        $psCustomObject = $devicePolicy.ScheduledActionsForRule | convertTo-JSON | ConvertFrom-JSON  
+        $scheduledActionsForRuleHashTable = @{} 
+        $psCustomObject.PsObject.Properties | ForEach-Object {     
+            $scheduledActionsForRuleHashTable[$_.Name] = $_.Value
+            
+        }         
         $hashtable = @{}
-        $myArray = @()
-
-        $scheduledActionsForRule.ScheduledActionConfigurations.PsObject.Properties | ForEach-Object {
+        $myArray = @()        
+        $scheduledActionsForRuleHashTable.ScheduledActionConfigurations.PsObject.Properties | ForEach-Object {
             if($_.Value -match "ActionType")
             {
                 foreach($item in $_.Value){
@@ -267,11 +263,12 @@ function Get-TargetResource
                  }               
             }
         }
-        $scheduledActionsForRule.Remove('ScheduledActionConfigurations')
-        $scheduledActionsForRule.Add('scheduledActionConfigurations',$myArray) #replace with the hashtable array we've created
-
+        $scheduledActionsForRuleHashTable.Remove('AdditionalProperties')
+        $scheduledActionsForRuleHashTable.Remove('Id')
+        $scheduledActionsForRuleHashTable.Remove('ScheduledActionConfigurations')
+        $scheduledActionsForRuleHashTable.Add('scheduledActionConfigurations',$myArray) #replace with the hashtable array we've created
         $complexScheduledActionsForRule = @()
-        $complexScheduledActionsForRule += $scheduledActionsForRule
+        $complexScheduledActionsForRule += $scheduledActionsForRuleHashTable
 
         $results = @{
             DisplayName                                        = $devicePolicy.DisplayName
@@ -1020,7 +1017,7 @@ function Export-TargetResource
                     $Results.Remove('Assignments') | Out-Null
                 }
             }
-
+<#
             if ($null -ne $Results.scheduledActionsForRule)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
@@ -1035,6 +1032,36 @@ function Export-TargetResource
                     $Results.Remove('scheduledActionsForRule') | Out-Null
                 }
             }
+#>
+
+            if ($Results.scheduledActionsForRule)
+            {
+                $complexTypeMapping = @(
+                    @{
+                        Name            = 'scheduledActionsForRule'
+                        CimInstanceName = 'MSFT_scheduledActionsForRule'
+                    }
+                    @{
+                        Name            = 'scheduledActionConfigurations'
+                        CimInstanceName = 'MSFT_scheduledActionConfigurations'
+                        isRequired      = $true
+                    }
+                )
+
+                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
+                    -ComplexObject $Results.scheduledActionsForRule `
+                    -CIMInstanceName MSFT_scheduledActionConfiguration `
+                    -ComplexTypeMapping $complexTypeMapping
+                if ($complexTypeStringResult)
+                {
+                    $Results.scheduledActionsForRule = $complexTypeStringResult
+                }
+                else
+                {
+                    $Results.Remove('scheduledActionsForRule') | Out-Null
+                }
+            }
+
 
             $Results = Update-M365DSCExportAuthenticationResults -ConnectionMode $ConnectionMode `
                 -Results $Results
@@ -1052,6 +1079,16 @@ function Export-TargetResource
                     $isCIMArray = $true
                 }
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'Assignments' -IsCIMArray:$isCIMArray
+            }
+
+            if ($Results.scheduledActionsForRule)
+            {
+                $isCIMArray = $false
+                if ($Results.scheduledActionsForRule.getType().Fullname -like '*[[\]]')
+                {
+                    $isCIMArray = $true
+                }
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'scheduledActionsForRule' -IsCIMArray:$isCIMArray
             }
 
             $dscContent += $currentDSCBlock
