@@ -1017,22 +1017,6 @@ function Export-TargetResource
                     $Results.Remove('Assignments') | Out-Null
                 }
             }
-<#
-            if ($null -ne $Results.scheduledActionsForRule)
-            {
-                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.scheduledActionsForRule `
-                    -CIMInstanceName 'MSFT_scheduledActionsForRule' 
-                if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
-                {
-                    $Results.scheduledActionsForRule = $complexTypeStringResult
-                }
-                else
-                {
-                    $Results.Remove('scheduledActionsForRule') | Out-Null
-                }
-            }
-#>
 
             if ($Results.scheduledActionsForRule)
             {
@@ -1050,7 +1034,7 @@ function Export-TargetResource
 
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.scheduledActionsForRule `
-                    -CIMInstanceName MSFT_scheduledActionConfiguration `
+                    -CIMInstanceName MSFT_scheduledActionsForRule `
                     -ComplexTypeMapping $complexTypeMapping
                 if ($complexTypeStringResult)
                 {
