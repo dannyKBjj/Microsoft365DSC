@@ -11,7 +11,54 @@ function Get-TargetResource
         [Parameter()]
         [System.String]
         $Description,
+#mine
+        [Parameter()]
+        [System.String]
+        [ValidateSet('none', 'low', 'medium', 'high')] #The password complexity types that can be set on Android. One of: NONE, LOW, MEDIUM, HIGH. This is an API targeted to Android 11+
+        $requiredPasswordComplexity,
 
+        [Parameter()]
+        [System.Boolean]
+        $securityBlockDeviceAdministratorManagedDevices, #Setting securityBlockDeviceAdministratorManagedDevices to true enhances security by preventing devices managed through the legacy device administrator method from accessing corporate resources
+
+        [Parameter()]
+        [System.String[]]
+        $restrictedApps, #specify applications that users are prohibited from installing or using on their devices.
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')] #Specifies Android Work Profile password type.
+        $workProfilePasswordRequiredType,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('None', 'Low', 'Medium', 'High')] #Specifies Android Work Profile password complexity.
+        $workProfileRequiredPasswordComplexity, 
+
+        [Parameter()]
+        [System.Boolean]
+        $WorkProfileRequirePassword, #Specifies if Android Work Profile password is required.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePreviousPasswordBlockCount, #Specifies the number of previous passwords that cannot be reused in an Android Work Profile compliance policy.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfileInactiveBeforeScreenLockInMinutes, #Defines the duration of inactivity (in minutes) after which the screen is locked.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordMinimumLength, #Specifies the minimum number of characters required in a password for an Android Work Profile
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordExpirationInDays, #Specifies the number of days before a password expires for an Android Work Profile
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $scheduledActionsForRule,
+#end mine
         [Parameter()]
         [System.Boolean]
         $PasswordRequired,
@@ -177,6 +224,7 @@ function Get-TargetResource
     {
         $devicePolicy = Get-MgBetaDeviceManagementDeviceCompliancePolicy `
             -All `
+            -ExpandProperty 'scheduledActionsForRule($expand=scheduledActionConfigurations)' `
             -ErrorAction SilentlyContinue | Where-Object `
             -FilterScript { $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.androidWorkProfileCompliancePolicy' -and `
                 $_.displayName -eq $($DisplayName) }
@@ -191,9 +239,56 @@ function Get-TargetResource
         }
 
         Write-Verbose -Message "Found Intune Android Work Profile Device Compliance Policy with displayName {$DisplayName}"
+
+                #scheduledActionsForRule needs processing before we can interact with it
+        $psCustomObject = $devicePolicy.ScheduledActionsForRule | convertTo-JSON | ConvertFrom-JSON
+        $scheduledActionsForRule = @{}
+        $psCustomObject.PsObject.Properties | ForEach-Object {
+            $scheduledActionsForRule[$_.Name] = $_.Value
+        }
+        
+        $scheduledActionsForRule.Remove('AdditionalProperties')
+        $scheduledActionsForRule.Remove('Id')
+
+        $hashtable = @{}
+        $myArray = @()
+
+        $scheduledActionsForRule.ScheduledActionConfigurations.PsObject.Properties | ForEach-Object {
+            if($_.Value -match "ActionType")
+            {
+                foreach($item in $_.Value){
+                    $hashtable = @{
+                        actionType                 = $item.ActionType
+                        gracePeriodHours           = $item.GracePeriodHours
+                        notificationMessageCcList  = $item.NotificationMessageCcList
+                        notificationTemplateId     = $item.NotificationTemplateId
+                    }
+                    $myArray += $hashtable                  
+                 }               
+            }
+        }
+        $scheduledActionsForRule.Remove('ScheduledActionConfigurations')
+        $scheduledActionsForRule.Add('scheduledActionConfigurations',$myArray) #replace with the hashtable array we've created
+
+        $complexScheduledActionsForRule = @()
+        $complexScheduledActionsForRule += $scheduledActionsForRule
+
         $results = @{
             DisplayName                                        = $devicePolicy.DisplayName
             Description                                        = $devicePolicy.Description
+
+            requiredPasswordComplexity                         = $devicePolicy.AdditionalProperties.requiredPasswordComplexity
+            securityBlockDeviceAdministratorManagedDevices     = $devicePolicy.AdditionalProperties.securityBlockDeviceAdministratorManagedDevices
+            restrictedApps                                     = $devicePolicy.AdditionalProperties.restrictedApps
+            workProfilePasswordRequiredType                    = $devicePolicy.AdditionalProperties.workProfilePasswordRequiredType
+            workProfileRequiredPasswordComplexity              = $devicePolicy.AdditionalProperties.workProfileRequiredPasswordComplexity
+            WorkProfileRequirePassword                         = $devicePolicy.AdditionalProperties.workProfileRequirePassword
+            workProfilePreviousPasswordBlockCount              = $devicePolicy.AdditionalProperties.workProfilePreviousPasswordBlockCount
+            workProfileInactiveBeforeScreenLockInMinutes       = $devicePolicy.AdditionalProperties.workProfileInactiveBeforeScreenLockInMinutes
+            workProfilePasswordMinimumLength                   = $devicePolicy.AdditionalProperties.workProfilePasswordMinimumLength
+            workProfilePasswordExpirationInDays                = $devicePolicy.AdditionalProperties.workProfilePasswordExpirationInDays
+            scheduledActionsForRule                            = $complexScheduledActionsForRule
+
             PasswordRequired                                   = $devicePolicy.AdditionalProperties.passwordRequired
             PasswordMinimumLength                              = $devicePolicy.AdditionalProperties.passwordMinimumLength
             PasswordRequiredType                               = $devicePolicy.AdditionalProperties.passwordRequiredType
@@ -267,7 +362,54 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $Description,
+#mine
+        [Parameter()]
+        [System.String]
+        [ValidateSet('none', 'low', 'medium', 'high')] #The password complexity types that can be set on Android. One of: NONE, LOW, MEDIUM, HIGH. This is an API targeted to Android 11+
+        $requiredPasswordComplexity,
 
+        [Parameter()]
+        [System.Boolean]
+        $securityBlockDeviceAdministratorManagedDevices, #Setting securityBlockDeviceAdministratorManagedDevices to true enhances security by preventing devices managed through the legacy device administrator method from accessing corporate resources
+
+        [Parameter()]
+        [System.String[]]
+        $restrictedApps, #specify applications that users are prohibited from installing or using on their devices.
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')] #Specifies Android Work Profile password type.
+        $workProfilePasswordRequiredType,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('None', 'Low', 'Medium', 'High')] #Specifies Android Work Profile password complexity.
+        $workProfileRequiredPasswordComplexity, 
+
+        [Parameter()]
+        [System.Boolean]
+        $WorkProfileRequirePassword, #Specifies if Android Work Profile password is required.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePreviousPasswordBlockCount, #Specifies the number of previous passwords that cannot be reused in an Android Work Profile compliance policy.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfileInactiveBeforeScreenLockInMinutes, #Defines the duration of inactivity (in minutes) after which the screen is locked.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordMinimumLength, #Specifies the minimum number of characters required in a password for an Android Work Profile
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordExpirationInDays, #Specifies the number of days before a password expires for an Android Work Profile
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $scheduledActionsForRule,
+#end mine
         [Parameter()]
         [System.Boolean]
         $PasswordRequired,
@@ -371,6 +513,7 @@ function Set-TargetResource
         [System.String]
         [ValidateSet('basic', 'hardwareBacked')]
         $SecurityRequiredAndroidSafetyNetEvaluationType,
+
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
@@ -519,7 +662,54 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $Description,
+#mine
+        [Parameter()]
+        [System.String]
+        [ValidateSet('none', 'low', 'medium', 'high')] #The password complexity types that can be set on Android. One of: NONE, LOW, MEDIUM, HIGH. This is an API targeted to Android 11+
+        $requiredPasswordComplexity,
 
+        [Parameter()]
+        [System.Boolean]
+        $securityBlockDeviceAdministratorManagedDevices, #Setting securityBlockDeviceAdministratorManagedDevices to true enhances security by preventing devices managed through the legacy device administrator method from accessing corporate resources
+
+        [Parameter()]
+        [System.String[]]
+        $restrictedApps, #specify applications that users are prohibited from installing or using on their devices.
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')] #Specifies Android Work Profile password type.
+        $workProfilePasswordRequiredType,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet('None', 'Low', 'Medium', 'High')] #Specifies Android Work Profile password complexity.
+        $workProfileRequiredPasswordComplexity, 
+
+        [Parameter()]
+        [System.Boolean]
+        $WorkProfileRequirePassword, #Specifies if Android Work Profile password is required.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePreviousPasswordBlockCount, #Specifies the number of previous passwords that cannot be reused in an Android Work Profile compliance policy.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfileInactiveBeforeScreenLockInMinutes, #Defines the duration of inactivity (in minutes) after which the screen is locked.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordMinimumLength, #Specifies the minimum number of characters required in a password for an Android Work Profile
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordExpirationInDays, #Specifies the number of days before a password expires for an Android Work Profile
+
+        [Parameter()]
+        [Microsoft.Management.Infrastructure.CimInstance[]]
+        $scheduledActionsForRule,
+#end mine
         [Parameter()]
         [System.Boolean]
         $PasswordRequired,
@@ -623,6 +813,7 @@ function Test-TargetResource
         [System.String]
         [ValidateSet('basic', 'hardwareBacked')]
         $SecurityRequiredAndroidSafetyNetEvaluationType,
+
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
@@ -827,6 +1018,21 @@ function Export-TargetResource
                 else
                 {
                     $Results.Remove('Assignments') | Out-Null
+                }
+            }
+
+            if ($null -ne $Results.scheduledActionsForRule)
+            {
+                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
+                    -ComplexObject $Results.scheduledActionsForRule `
+                    -CIMInstanceName 'MSFT_scheduledActionsForRule' 
+                if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
+                {
+                    $Results.scheduledActionsForRule = $complexTypeStringResult
+                }
+                else
+                {
+                    $Results.Remove('scheduledActionsForRule') | Out-Null
                 }
             }
 

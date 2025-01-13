@@ -18,23 +18,53 @@ function Get-TargetResource
 #mine
         [Parameter()]
         [System.String]
+        [ValidateSet('none', 'low', 'medium', 'high')] #The password complexity types that can be set on Android. One of: NONE, LOW, MEDIUM, HIGH. This is an API targeted to Android 11+
         $requiredPasswordComplexity,
 
         [Parameter()]
         [System.Boolean]
-        $securityBlockDeviceAdministratorManagedDevices,
+        $securityBlockDeviceAdministratorManagedDevices, #Setting securityBlockDeviceAdministratorManagedDevices to true enhances security by preventing devices managed through the legacy device administrator method from accessing corporate resources
 
         [Parameter()]
         [System.String[]]
-        $restrictedApps,
+        $restrictedApps, #specify applications that users are prohibited from installing or using on their devices.
 
         [Parameter()]
         [System.String]
-        [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')]
+        [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')] #Specifies Android Work Profile password type.
         $workProfilePasswordRequiredType,
 
+        [Parameter()]
+        [System.String]
+        [ValidateSet('None', 'Low', 'Medium', 'High')] #Specifies Android Work Profile password complexity.
+        $workProfileRequiredPasswordComplexity, 
 
-#end mine
+        [Parameter()]
+        [System.Boolean]
+        $WorkProfileRequirePassword, #Specifies if Android Work Profile password is required.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePreviousPasswordBlockCount, #Specifies the number of previous passwords that cannot be reused in an Android Work Profile compliance policy.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfileInactiveBeforeScreenLockInMinutes, #Defines the duration of inactivity (in minutes) after which the screen is locked.
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordMinimumLength, #Specifies the minimum number of characters required in a password for an Android Work Profile
+
+        [Parameter()]
+        [System.Int32]
+        $workProfilePasswordExpirationInDays, #Specifies the number of days before a password expires for an Android Work Profile
+
+<#
+        [Parameter()]
+        [System.Boolean]
+        $passcodeBlockSimple
+
+#end mine #>
         [Parameter()]
         [System.String]
         [ValidateSet('unavailable', 'secured', 'low', 'medium', 'high', 'notSet')]
@@ -178,7 +208,7 @@ function Get-TargetResource
             requiredPasswordComplexity                         = $devicePolicy.AdditionalProperties.requiredPasswordComplexity
             securityBlockDeviceAdministratorManagedDevices     = $devicePolicy.AdditionalProperties.securityBlockDeviceAdministratorManagedDevices
             restrictedApps                                     = $devicePolicy.AdditionalProperties.restrictedApps
-
+            
             DisplayName                                        = $devicePolicy.DisplayName
             Description                                        = $devicePolicy.Description
             DeviceThreatProtectionEnabled                      = $devicePolicy.AdditionalProperties.deviceThreatProtectionEnabled
