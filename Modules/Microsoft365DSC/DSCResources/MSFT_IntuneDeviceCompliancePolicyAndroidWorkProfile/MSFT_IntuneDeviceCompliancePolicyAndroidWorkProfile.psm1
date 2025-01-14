@@ -248,27 +248,20 @@ function Get-TargetResource
             
         }         
         $hashtable = @{}
-        $myArray = @()        
+        $complexScheduledActionsForRule = @()        
         $scheduledActionsForRuleHashTable.ScheduledActionConfigurations.PsObject.Properties | ForEach-Object {
             if($_.Value -match "ActionType")
             {
                 foreach($item in $_.Value){
-                    $hashtable = @{
-                        actionType                 = $item.ActionType
-                        gracePeriodHours           = $item.GracePeriodHours
-                        notificationMessageCcList  = $item.NotificationMessageCcList
-                        notificationTemplateId     = $item.NotificationTemplateId
-                    }
-                    $myArray += $hashtable                  
+                        $hashtable = @{}
+                        $hashtable.Add('actionType', $item.ActionType)
+                        $hashtable.Add('gracePeriodHours', $item.GracePeriodHours)
+                        $hashtable.Add('notificationMessageCcList', [Array]$item.NotificationMessageCcList)
+                        $hashtable.Add('notificationTemplateId', $item.NotificationTemplateId)
+                        $complexScheduledActionsForRule += $hashtable                    
                  }               
             }
         }
-        $scheduledActionsForRuleHashTable.Remove('AdditionalProperties')
-        $scheduledActionsForRuleHashTable.Remove('Id')
-        $scheduledActionsForRuleHashTable.Remove('ScheduledActionConfigurations')
-        $scheduledActionsForRuleHashTable.Add('scheduledActionConfigurations',$myArray) #replace with the hashtable array we've created
-        $complexScheduledActionsForRule = @()
-        $complexScheduledActionsForRule += $scheduledActionsForRuleHashTable
 
         $results = @{
             DisplayName                                        = $devicePolicy.DisplayName
@@ -575,7 +568,7 @@ function Set-TargetResource
     $PSBoundParameters.Remove('TenantId') | Out-Null
     $PSBoundParameters.Remove('ApplicationSecret') | Out-Null
     $PSBoundParameters.Remove('AccessTokens') | Out-Null
-
+    <#
     $scheduledActionsForRule = @{
         '@odata.type'                 = '#microsoft.graph.deviceComplianceScheduledActionForRule'
         ruleName                      = 'PasswordRequired'
@@ -586,6 +579,38 @@ function Set-TargetResource
             }
         )
     }
+    #>
+#reconstruct scheduled action configurations for use with New/Update-MgBetaDeviceManagementDeviceCompliancePolicy
+$PSBoundParameters.scheduledActionsForRule.CimInstanceProperties | Out-File "C:\dsc-5592\CimInstanceProperties.txt"
+
+foreach ($property in $PSBoundParameters.scheduledActionsForRule.CimInstanceProperties) {
+        $scheduledActionConfigurations = @()   
+        $hashtable = @{}
+        $hashtable.Add('actionType', $property.actionType)
+        $hashtable.Add('gracePeriodHours', [int]$property.gracePeriodHours)
+        $hashtable.Add('notificationMessageCcList', [Array]$property.notificationMessageCcList)
+        $hashtable.Add('notificationTemplateId', $property.notificationTemplateId)
+
+        $scheduledActionConfigurations += $hashtable  
+         <#    
+        foreach($item in $property.Value){
+            $hashtable = @{}
+            $hashtable.Add('actionType', $item.actionType)
+            $hashtable.Add('gracePeriodHours', [int]$item.gracePeriodHours)
+            $hashtable.Add('notificationMessageCcList', [Array]$item.notificationMessageCcList)
+            $hashtable.Add('notificationTemplateId', $item.notificationTemplateId)
+
+            $scheduledActionConfigurations += $hashtable  
+            $scheduledActionConfigurations | Out-File "C:\dsc-5592\HASH.txt"
+        }
+        #>
+}
+$scheduledActionsForRule = @{
+    '@odata.type'                 = '#microsoft.graph.deviceComplianceScheduledActionForRule'
+    ruleName                      = '' #this is always blank and can't be set in GUI
+    scheduledActionConfigurations = $scheduledActionConfigurations
+}
+$scheduledActionsForRule | Out-File "C:\dsc-5592\scheduledActionsForRuleBROKE.txt"
 
     if ($Ensure -eq 'Present' -and $currentDeviceAndroidPolicy.Ensure -eq 'Absent')
     {
@@ -849,7 +874,7 @@ function Test-TargetResource
         [System.String[]]
         $AccessTokens
     )
-
+<#
     #Ensure the proper dependencies are installed in the current environment.
     Confirm-M365DSCDependencies
 
@@ -875,6 +900,21 @@ function Test-TargetResource
 
     $ValuesToCheck = $PSBoundParameters
 
+#EXPERMIMENTS
+$Temp = $PSBoundParameters.scheduledActionsForRule
+foreach ($property in $PSBoundParameters.scheduledActionsForRule.CimInstanceProperties) {
+    If($property.Name -eq 'scheduledActionConfigurations')
+    {
+        $property.Value.CimInstanceProperties | Out-File -FilePath "C:\dsc-5592\$($property.Name).txt"
+        $property | Out-File -FilePath "C:\dsc-5592\properties.txt"
+        $property.Value[0].actionType | Out-File -FilePath "C:\dsc-5592\properties.txt"
+    }
+}
+$CurrentValues.Remove('scheduledActionsForRule')
+$ValuesToCheck.Remove('scheduledActionsForRule')
+$PSBoundParameters.Remove('scheduledActionsForRule')
+#END EXPERIMENTS
+
     $testResult = $true
     if ($CurrentValues.Ensure -ne $Ensure)
     {
@@ -890,6 +930,28 @@ function Test-TargetResource
     }
     #endregion
 
+    #Compare Cim instances
+    foreach ($key in $PSBoundParameters.Keys)
+    {
+        $source = $PSBoundParameters.$key
+        $target = $CurrentValues.$key
+        if ($source.getType().Name -like '*CimInstance*')
+        {
+            $testResult = Compare-M365DSCComplexObject `
+                -Source ($source) `
+                -Target ($target) -Verbose
+
+            if (-Not $testResult)
+            {
+                Write-Verbose -Message "Drift detected for the complex object key: $key"
+                $testResult = $false
+                break
+            }
+
+            $ValuesToCheck.Remove($key) | Out-Null
+        }
+    }
+
     if ($testResult)
     {
         $TestResult = Test-M365DSCParameterState -CurrentValues $CurrentValues `
@@ -901,6 +963,79 @@ function Test-TargetResource
 
     return $TestResult
 }
+#>
+
+    #Ensure the proper dependencies are installed in the current environment.
+    Confirm-M365DSCDependencies
+
+    #region Telemetry
+    $ResourceName = $MyInvocation.MyCommand.ModuleName.Replace('MSFT_', '')
+    $CommandName = $MyInvocation.MyCommand
+    $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
+        -CommandName $CommandName `
+        -Parameters $PSBoundParameters
+    Add-M365DSCTelemetryEvent -Data $data
+    #endregion
+
+    Write-Verbose -Message "Testing configuration of {$id}"
+
+    $CurrentValues = Get-TargetResource @PSBoundParameters
+    $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
+    $PSBoundParameters | OUt-File "C:\dsc-5592\BoundParams.txt"
+    $ValuesToCheck | OUt-File "C:\dsc-5592\ValuesToCheck.txt"
+    if ($CurrentValues.Ensure -ne $Ensure)
+    {
+        Write-Verbose -Message "Test-TargetResource returned $false"
+        return $false
+    }
+    $testResult = $true
+
+
+#$CurrentValues.Remove('scheduledActionsForRule')
+#$ValuesToCheck.Remove('scheduledActionsForRule')
+#$PSBoundParameters.Remove('scheduledActionsForRule')
+    #Compare Cim instances
+    foreach ($key in $PSBoundParameters.Keys)
+    {
+        $source = $PSBoundParameters.$key
+        $source | Out-File "C:\dsc-5592\source\$key.txt"
+        $target | Out-File "C:\dsc-5592\target\$key.txt"
+        $target = $CurrentValues.$key
+        if ($source.getType().Name -like '*CimInstance*')
+        {
+            $testResult = Compare-M365DSCComplexObject `
+                -Source ($source) `
+                -Target ($target) -Verbose
+
+            if (-Not $testResult)
+            {
+                Write-Verbose -Message "Drift detected for the complex object key: $key"
+                $testResult = $false
+                break
+            }
+
+            $ValuesToCheck.Remove($key) | Out-Null
+        }
+    }
+
+    if ($testResult)
+    {
+        $ValuesToCheck = Remove-M365DSCAuthenticationParameter -BoundParameters $ValuesToCheck
+        $ValuesToCheck.Remove('Id') | Out-Null
+
+        Write-Verbose -Message "Current Values: $(Convert-M365DscHashtableToString -Hashtable $CurrentValues)"
+        Write-Verbose -Message "Target Values: $(Convert-M365DscHashtableToString -Hashtable $ValuesToCheck)"
+
+        $testResult = Test-M365DSCParameterState -CurrentValues $CurrentValues `
+            -Source $($MyInvocation.MyCommand.Source) `
+            -DesiredValues $PSBoundParameters `
+            -ValuesToCheck $ValuesToCheck.Keys
+    }
+    Write-Verbose -Message "Test-TargetResource returned $testResult"
+
+    return $testResult
+}
+
 
 function Export-TargetResource
 {
@@ -1020,22 +1155,9 @@ function Export-TargetResource
 
             if ($Results.scheduledActionsForRule)
             {
-                $complexTypeMapping = @(
-                    @{
-                        Name            = 'scheduledActionsForRule'
-                        CimInstanceName = 'MSFT_scheduledActionsForRule'
-                    }
-                    @{
-                        Name            = 'scheduledActionConfigurations'
-                        CimInstanceName = 'MSFT_scheduledActionConfigurations'
-                        isRequired      = $true
-                    }
-                )
-
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
                     -ComplexObject $Results.scheduledActionsForRule `
-                    -CIMInstanceName MSFT_scheduledActionsForRule `
-                    -ComplexTypeMapping $complexTypeMapping
+                    -CIMInstanceName MSFT_scheduledActionConfigurations
                 if ($complexTypeStringResult)
                 {
                     $Results.scheduledActionsForRule = $complexTypeStringResult

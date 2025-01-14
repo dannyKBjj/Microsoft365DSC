@@ -19,14 +19,6 @@ class MSFT_scheduledActionConfigurations
     [Write, Description("A list of group IDs to specify who to CC this notification message to.")] String notificationMessageCCList[];
 };
 
-[ClassVersion("1.0.0.0")]
-class MSFT_scheduledActionsForRule
-{
-    [Write, Description("The RuleName, usually blank.")] String ruleName;
-    [Write, Description("Non-compliance action."), EmbeddedInstance("MSFT_scheduledActionConfigurations")] String scheduledActionConfigurations[];
-};
-
-
 [ClassVersion("1.0.0.0"), FriendlyName("IntuneDeviceCompliancePolicyAndroidWorkProfile")]
 class MSFT_IntuneDeviceCompliancePolicyAndroidWorkProfile : OMI_BaseResource
 {
@@ -44,7 +36,7 @@ class MSFT_IntuneDeviceCompliancePolicyAndroidWorkProfile : OMI_BaseResource
     [Write, Description("Defines the duration of inactivity (in minutes) after which the screen is locked.")] Uint32 workProfileInactiveBeforeScreenLockInMinutes;
     [Write, Description("Specifies the minimum number of characters required in a password for an Android Work Profile.")] Uint32 workProfilePasswordMinimumLength;
     [Write, Description("Specifies the number of days before a password expires for an Android Work Profile.")] Uint32 workProfilePasswordExpirationInDays;
-    [Write, Description("Specifies the non-compliance actions."), EmbeddedInstance("MSFT_scheduledActionsForRule")] String scheduledActionsForRule[];
+    [Write, Description("Specifies the non-compliance actions."), EmbeddedInstance("MSFT_scheduledActionConfigurations")] String scheduledActionsForRule[];
 
     [Write, Description("PasswordRequired of the AndroidWorkProfile device compliance policy.")] Boolean PasswordRequired;
     [Write, Description("PasswordMinimumLength of the AndroidWorkProfile device compliance policy.")] Uint32 PasswordMinimumLength;
