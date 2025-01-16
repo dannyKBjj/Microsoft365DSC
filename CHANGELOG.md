@@ -1,6 +1,16 @@
 # Change log for Microsoft365DSC
 
 # UNRELEASED
+* IntuneDeviceCompliancePolicyAndroidDeviceOwner
+  * Added missing properties for androidForWorkCompliancePolicy resource type: https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfig-androiddeviceownercompliancepolicy?view=graph-rest-beta.
+  * Non-compliance actions now supported for Export- Test- Get-
+  * Non-compliance actions now supported for Set- when creating a policy, but not when updating a policy. Update can't be supported due to MgGraph bug.
+    FIXES [#5593](https://github.com/microsoft/Microsoft365DSC/issues/5593)
+* IntuneDeviceCompliancePolicyAndroidWorkProfile
+  * Added missing properties for androidForWorkCompliancePolicy resource type: https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfig-androidforworkcompliancepolicy?view=graph-rest-beta.
+  * Non-compliance actions now supported for Export- Test- Get-
+  * Non-compliance actions now supported for Set- when creating a policy, but not when updating a policy. Update can't be supported due to MgGraph bug.
+    FIXES [#5592](https://github.com/microsoft/Microsoft365DSC/issues/5592)
 
 # 1.25.108.1
 

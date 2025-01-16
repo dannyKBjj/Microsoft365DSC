@@ -11,19 +11,19 @@ function Get-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-#mine
+
         [Parameter()]
         [System.String]
-        [ValidateSet('none', 'low', 'medium', 'high')] #The password complexity types that can be set on Android. One of: NONE, LOW, MEDIUM, HIGH. This is an API targeted to Android 11+
+        [ValidateSet('none', 'low', 'medium', 'high')]
         $requiredPasswordComplexity,
 
         [Parameter()]
         [System.Boolean]
-        $securityBlockDeviceAdministratorManagedDevices, #Setting securityBlockDeviceAdministratorManagedDevices to true enhances security by preventing devices managed through the legacy device administrator method from accessing corporate resources
+        $securityBlockDeviceAdministratorManagedDevices,
 
         [Parameter()]
         [System.String[]]
-        $restrictedApps, #specify applications that users are prohibited from installing or using on their devices.
+        $restrictedApps,
 
         [Parameter()]
         [System.String]
@@ -32,33 +32,33 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('None', 'Low', 'Medium', 'High')] #Specifies Android Work Profile password complexity.
+        [ValidateSet('None', 'Low', 'Medium', 'High')]
         $workProfileRequiredPasswordComplexity, 
 
         [Parameter()]
         [System.Boolean]
-        $WorkProfileRequirePassword, #Specifies if Android Work Profile password is required.
+        $WorkProfileRequirePassword,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePreviousPasswordBlockCount, #Specifies the number of previous passwords that cannot be reused in an Android Work Profile compliance policy.
+        $workProfilePreviousPasswordBlockCount,
 
         [Parameter()]
         [System.Int32]
-        $workProfileInactiveBeforeScreenLockInMinutes, #Defines the duration of inactivity (in minutes) after which the screen is locked.
+        $workProfileInactiveBeforeScreenLockInMinutes,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordMinimumLength, #Specifies the minimum number of characters required in a password for an Android Work Profile
+        $workProfilePasswordMinimumLength,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordExpirationInDays, #Specifies the number of days before a password expires for an Android Work Profile
+        $workProfilePasswordExpirationInDays,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $scheduledActionsForRule,
-#end mine
+
         [Parameter()]
         [System.Boolean]
         $PasswordRequired,
@@ -266,7 +266,6 @@ function Get-TargetResource
         $results = @{
             DisplayName                                        = $devicePolicy.DisplayName
             Description                                        = $devicePolicy.Description
-
             requiredPasswordComplexity                         = $devicePolicy.AdditionalProperties.requiredPasswordComplexity
             securityBlockDeviceAdministratorManagedDevices     = $devicePolicy.AdditionalProperties.securityBlockDeviceAdministratorManagedDevices
             restrictedApps                                     = $devicePolicy.AdditionalProperties.restrictedApps
@@ -278,7 +277,6 @@ function Get-TargetResource
             workProfilePasswordMinimumLength                   = $devicePolicy.AdditionalProperties.workProfilePasswordMinimumLength
             workProfilePasswordExpirationInDays                = $devicePolicy.AdditionalProperties.workProfilePasswordExpirationInDays
             scheduledActionsForRule                            = $complexScheduledActionsForRule
-
             PasswordRequired                                   = $devicePolicy.AdditionalProperties.passwordRequired
             PasswordMinimumLength                              = $devicePolicy.AdditionalProperties.passwordMinimumLength
             PasswordRequiredType                               = $devicePolicy.AdditionalProperties.passwordRequiredType
@@ -303,7 +301,6 @@ function Get-TargetResource
             SecurityRequireUpToDateSecurityProviders           = $devicePolicy.AdditionalProperties.securityRequireUpToDateSecurityProviders
             SecurityRequireCompanyPortalAppIntegrity           = $devicePolicy.AdditionalProperties.securityRequireCompanyPortalAppIntegrity
             SecurityRequiredAndroidSafetyNetEvaluationType     = $devicePolicy.AdditionalProperties.securityRequiredAndroidSafetyNetEvaluationType
-
             RoleScopeTagIds                                    = $devicePolicy.AdditionalProperties.roleScopeTagIds
             Ensure                                             = 'Present'
             Credential                                         = $Credential
@@ -352,19 +349,19 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-#mine
+
         [Parameter()]
         [System.String]
-        [ValidateSet('none', 'low', 'medium', 'high')] #The password complexity types that can be set on Android. One of: NONE, LOW, MEDIUM, HIGH. This is an API targeted to Android 11+
+        [ValidateSet('none', 'low', 'medium', 'high')]
         $requiredPasswordComplexity,
 
         [Parameter()]
         [System.Boolean]
-        $securityBlockDeviceAdministratorManagedDevices, #Setting securityBlockDeviceAdministratorManagedDevices to true enhances security by preventing devices managed through the legacy device administrator method from accessing corporate resources
+        $securityBlockDeviceAdministratorManagedDevices,
 
         [Parameter()]
         [System.String[]]
-        $restrictedApps, #specify applications that users are prohibited from installing or using on their devices.
+        $restrictedApps,
 
         [Parameter()]
         [System.String]
@@ -373,33 +370,33 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('None', 'Low', 'Medium', 'High')] #Specifies Android Work Profile password complexity.
+        [ValidateSet('None', 'Low', 'Medium', 'High')]
         $workProfileRequiredPasswordComplexity, 
 
         [Parameter()]
         [System.Boolean]
-        $WorkProfileRequirePassword, #Specifies if Android Work Profile password is required.
+        $WorkProfileRequirePassword,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePreviousPasswordBlockCount, #Specifies the number of previous passwords that cannot be reused in an Android Work Profile compliance policy.
+        $workProfilePreviousPasswordBlockCount,
 
         [Parameter()]
         [System.Int32]
-        $workProfileInactiveBeforeScreenLockInMinutes, #Defines the duration of inactivity (in minutes) after which the screen is locked.
+        $workProfileInactiveBeforeScreenLockInMinutes,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordMinimumLength, #Specifies the minimum number of characters required in a password for an Android Work Profile
+        $workProfilePasswordMinimumLength,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordExpirationInDays, #Specifies the number of days before a password expires for an Android Work Profile
+        $workProfilePasswordExpirationInDays,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $scheduledActionsForRule,
-#end mine
+
         [Parameter()]
         [System.Boolean]
         $PasswordRequired,
@@ -504,6 +501,7 @@ function Set-TargetResource
         [ValidateSet('basic', 'hardwareBacked')]
         $SecurityRequiredAndroidSafetyNetEvaluationType,
 
+
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $Assignments,
@@ -561,23 +559,11 @@ function Set-TargetResource
     
     $currentDeviceAndroidPolicy = Get-TargetResource @PSBoundParameters
     
-    
-    <#
-    $PSBoundParameters.Remove('Ensure') | Out-Null
-    $PSBoundParameters.Remove('Credential') | Out-Null
-    $PSBoundParameters.Remove('ApplicationId') | Out-Null
-    $PSBoundParameters.Remove('TenantId') | Out-Null
-    $PSBoundParameters.Remove('ApplicationSecret') | Out-Null
-    $PSBoundParameters.Remove('AccessTokens') | Out-Null
-    #>
-    
     $PSBoundParameters = Remove-M365DSCAuthenticationParameter -BoundParameters $PSBoundParameters
-    #reconstruct scheduled action configurations for use with New/Update-MgBetaDeviceManagementDeviceCompliancePolicy
-    
-    $allTargetValues = Convert-M365DscHashtableToString -Hashtable $PSBoundParameters 
-    
-    $PSBoundParameters.Remove('scheduledActionsForRule') | Out-Null
-    
+
+    #reconstruct scheduled action configurations for use with New/Update-MgBetaDeviceManagementDeviceCompliancePolicy   
+    $allTargetValues = Convert-M365DscHashtableToString -Hashtable $PSBoundParameters    
+    $PSBoundParameters.Remove('scheduledActionsForRule') | Out-Null   
     if ($allTargetValues -match '\bscheduledActionsForRule=\(\{([^\)]+)\}\)') 
     {    
         $scheduledActionConfigurations = @() #define array we'll be adding hashtables to      
@@ -586,8 +572,7 @@ function Set-TargetResource
             $array = $item -split ";"
             $array = $array | Where-Object { $_ -notlike "id=*" } #drop id we don't want it  
             $hashtable = @{}              
-            foreach ($item in $array) {
-                
+            foreach ($item in $array) {             
                 if ($item -match "^(.*?)=(.*)$") 
                 {
                     $key = $matches[1].Trim()
@@ -599,17 +584,12 @@ function Set-TargetResource
         }                       
     }
 
-
-
-    Write-Verbose -Message "CODE ABOVE RULED OUT"  
-
     $myScheduledActionsForRule = @{
         '@odata.type'                 = '#microsoft.graph.deviceComplianceScheduledActionForRule'
         ruleName                      = '' #this is always blank and can't be set in GUI
         scheduledActionConfigurations = $scheduledActionConfigurations
     }
-    Write-Verbose -Message "CODE BELOW RULED OUT"
-    
+       
     if ($Ensure -eq 'Present' -and $currentDeviceAndroidPolicy.Ensure -eq 'Absent')
     {
         Write-Verbose -Message "Creating new Intune Android Work Profile Device Compliance Policy {$DisplayName}"
@@ -648,7 +628,8 @@ function Set-TargetResource
         $AdditionalProperties = Get-M365DSCIntuneDeviceCompliancePolicyAndroidWorkProfileAdditionalProperties -Properties ([System.Collections.Hashtable]$PSBoundParameters)
         Update-MgBetaDeviceManagementDeviceCompliancePolicy -AdditionalProperties $AdditionalProperties `
             -Description $Description `
-            -DeviceCompliancePolicyId $configDeviceAndroidPolicy.Id
+            -DeviceCompliancePolicyId $configDeviceAndroidPolicy.Id #`
+            #-ScheduledActionsForRule $myScheduledActionsForRule #This does not work due to a bug with PATCH, no other method works either (tried Update-MgDeviceManagementDeviceCompliancePolicyScheduledActionForRule and Invoke-MgGraph)
 
         #region Assignments
         $assignmentsHash = ConvertTo-IntunePolicyAssignment -IncludeDeviceFilter:$true -Assignments $Assignments
@@ -682,19 +663,19 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-#mine
+
         [Parameter()]
         [System.String]
-        [ValidateSet('none', 'low', 'medium', 'high')] #The password complexity types that can be set on Android. One of: NONE, LOW, MEDIUM, HIGH. This is an API targeted to Android 11+
+        [ValidateSet('none', 'low', 'medium', 'high')]
         $requiredPasswordComplexity,
 
         [Parameter()]
         [System.Boolean]
-        $securityBlockDeviceAdministratorManagedDevices, #Setting securityBlockDeviceAdministratorManagedDevices to true enhances security by preventing devices managed through the legacy device administrator method from accessing corporate resources
+        $securityBlockDeviceAdministratorManagedDevices,
 
         [Parameter()]
         [System.String[]]
-        $restrictedApps, #specify applications that users are prohibited from installing or using on their devices.
+        $restrictedApps,
 
         [Parameter()]
         [System.String]
@@ -703,33 +684,33 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        [ValidateSet('None', 'Low', 'Medium', 'High')] #Specifies Android Work Profile password complexity.
+        [ValidateSet('None', 'Low', 'Medium', 'High')]
         $workProfileRequiredPasswordComplexity, 
 
         [Parameter()]
         [System.Boolean]
-        $WorkProfileRequirePassword, #Specifies if Android Work Profile password is required.
+        $WorkProfileRequirePassword,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePreviousPasswordBlockCount, #Specifies the number of previous passwords that cannot be reused in an Android Work Profile compliance policy.
+        $workProfilePreviousPasswordBlockCount,
 
         [Parameter()]
         [System.Int32]
-        $workProfileInactiveBeforeScreenLockInMinutes, #Defines the duration of inactivity (in minutes) after which the screen is locked.
+        $workProfileInactiveBeforeScreenLockInMinutes,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordMinimumLength, #Specifies the minimum number of characters required in a password for an Android Work Profile
+        $workProfilePasswordMinimumLength,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordExpirationInDays, #Specifies the number of days before a password expires for an Android Work Profile
+        $workProfilePasswordExpirationInDays,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $scheduledActionsForRule,
-#end mine
+
         [Parameter()]
         [System.Boolean]
         $PasswordRequired,
@@ -906,14 +887,12 @@ function Test-TargetResource
             $testResult = Compare-M365DSCComplexObject `
                 -Source ($source) `
                 -Target ($target) -Verbose
-
             if (-Not $testResult)
             {
                 Write-Verbose -Message "Drift detected for the complex object key: $key"
                 $testResult = $false
                 break
             }
-
             $ValuesToCheck.Remove($key) | Out-Null
         }
     }
@@ -1067,7 +1046,6 @@ function Export-TargetResource
                     $Results.Remove('scheduledActionsForRule') | Out-Null
                 }
             }
-
 
             $Results = Update-M365DSCExportAuthenticationResults -ConnectionMode $ConnectionMode `
                 -Results $Results
