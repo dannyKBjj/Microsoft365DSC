@@ -75,8 +75,10 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     PasswordPreviousPasswordCountToBlock               = 10
                     StorageRequireEncryption                           = $True
                     SecurityRequireIntuneAppIntegrity                  = $True
+                    minAndroidSecurityPatchLevel                       = "2024-01-24"
+                    securityRequiredAndroidSafetyNetEvaluationType    = "hardwareBacked"
                     Ensure                                             = 'Present'
-                    Credential                                         = $Credential
+                    Credential                                         = $Credential                    
                 }
 
                 Mock -CommandName Get-MgBetaDeviceManagementDeviceCompliancePolicy -MockWith {
@@ -118,6 +120,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     PasswordPreviousPasswordCountToBlock               = 10
                     StorageRequireEncryption                           = $True
                     SecurityRequireIntuneAppIntegrity                  = $True
+                    minAndroidSecurityPatchLevel                       = "2024-01-24"
+                    securityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
                     Ensure                                             = 'Present'
                     Credential                                         = $Credential
                 }
@@ -145,6 +149,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             StorageRequireEncryption                           = $True
                             SecurityRequireIntuneAppIntegrity                  = $True
                             RoleScopeTagIds                                    = '0'
+                            minAndroidSecurityPatchLevel                       = "2024-01-24"
+                            securityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
                         }
                     }
                 }
@@ -185,6 +191,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     StorageRequireEncryption                           = $True
                     SecurityRequireIntuneAppIntegrity                  = $True
                     Ensure                                             = 'Present'
+                    minAndroidSecurityPatchLevel                       = "2024-01-24"
+                    securityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
                     Credential                                         = $Credential
                 }
 
@@ -211,6 +219,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             StorageRequireEncryption                           = $True
                             SecurityRequireIntuneAppIntegrity                  = $True
                             RoleScopeTagIds                                    = '0'
+                            minAndroidSecurityPatchLevel                       = "2024-01-24"
+                            securityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
                         }
                     }
                 }
@@ -252,6 +262,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             StorageRequireEncryption                           = $True
                             SecurityRequireIntuneAppIntegrity                  = $True
                             RoleScopeTagIds                                    = '0'
+                            minAndroidSecurityPatchLevel                       = "2024-01-24"
+                            securityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
                         }
                     }
                 }
@@ -302,6 +314,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             StorageRequireEncryption                           = $True
                             SecurityRequireIntuneAppIntegrity                  = $True
                             RoleScopeTagIds                                    = '0'
+                            minAndroidSecurityPatchLevel                       = "2024-01-24"
+                            securityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
                         }
                     }
                 }
