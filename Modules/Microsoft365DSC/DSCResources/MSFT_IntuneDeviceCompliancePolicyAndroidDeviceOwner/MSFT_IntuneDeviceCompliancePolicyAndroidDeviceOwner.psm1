@@ -18,44 +18,44 @@ function Get-TargetResource
 
         [Parameter()]
         [System.String]
-        $minAndroidSecurityPatchLevel,
+        $MinAndroidSecurityPatchLevel,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumLetterCharacters,
+        $PasswordMinimumLetterCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumLowerCaseCharacters,
+        $PasswordMinimumLowerCaseCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumNonLetterCharacters,
+        $PasswordMinimumNonLetterCharacters,
         
         [Parameter()]
         [System.Int32]
-        $passwordMinimumNumericCharacters,
+        $PasswordMinimumNumericCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumSymbolCharacters,
+        $PasswordMinimumSymbolCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumUpperCaseCharacters,
+        $PasswordMinimumUpperCaseCharacters,
 
         [Parameter()]
         [System.Boolean]
-        $requireNoPendingSystemUpdates,
+        $RequireNoPendingSystemUpdates,
 
         [Parameter()]
         [System.String]
         [ValidateSet('basic', 'hardwareBacked')]
-        $securityRequiredAndroidSafetyNetEvaluationType,
+        $SecurityRequiredAndroidSafetyNetEvaluationType,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $scheduledActionsForRule,
+        $ScheduledActionsForRule,
 
         [Parameter()]
         [System.String]
@@ -224,16 +224,16 @@ function Get-TargetResource
         $results = @{
             DisplayName                                        = $devicePolicy.DisplayName
             Description                                        = $devicePolicy.Description
-            minAndroidSecurityPatchLevel                       = $devicePolicy.AdditionalProperties.minAndroidSecurityPatchLevel
-            passwordMinimumLetterCharacters                    = $devicePolicy.AdditionalProperties.passwordMinimumLetterCharacters
-            passwordMinimumLowerCaseCharacters                 = $devicePolicy.AdditionalProperties.passwordMinimumLowerCaseCharacters
-            passwordMinimumNonLetterCharacters                 = $devicePolicy.AdditionalProperties.passwordMinimumNonLetterCharacters
-            passwordMinimumNumericCharacters                   = $devicePolicy.AdditionalProperties.passwordMinimumNumericCharacters
-            passwordMinimumSymbolCharacters                    = $devicePolicy.AdditionalProperties.passwordMinimumSymbolCharacters
-            passwordMinimumUpperCaseCharacters                 = $devicePolicy.AdditionalProperties.passwordMinimumUpperCaseCharacters
-            requireNoPendingSystemUpdates                      = $devicePolicy.AdditionalProperties.requireNoPendingSystemUpdates
-            securityRequiredAndroidSafetyNetEvaluationType     = $devicePolicy.AdditionalProperties.securityRequiredAndroidSafetyNetEvaluationType
-            scheduledActionsForRule                            = $complexScheduledActionsForRule
+            MinAndroidSecurityPatchLevel                       = $devicePolicy.AdditionalProperties.minAndroidSecurityPatchLevel
+            PasswordMinimumLetterCharacters                    = $devicePolicy.AdditionalProperties.passwordMinimumLetterCharacters
+            PasswordMinimumLowerCaseCharacters                 = $devicePolicy.AdditionalProperties.passwordMinimumLowerCaseCharacters
+            PasswordMinimumNonLetterCharacters                 = $devicePolicy.AdditionalProperties.passwordMinimumNonLetterCharacters
+            PasswordMinimumNumericCharacters                   = $devicePolicy.AdditionalProperties.passwordMinimumNumericCharacters
+            PasswordMinimumSymbolCharacters                    = $devicePolicy.AdditionalProperties.passwordMinimumSymbolCharacters
+            PasswordMinimumUpperCaseCharacters                 = $devicePolicy.AdditionalProperties.passwordMinimumUpperCaseCharacters
+            RequireNoPendingSystemUpdates                      = $devicePolicy.AdditionalProperties.requireNoPendingSystemUpdates
+            SecurityRequiredAndroidSafetyNetEvaluationType     = $devicePolicy.AdditionalProperties.securityRequiredAndroidSafetyNetEvaluationType
+            ScheduledActionsForRule                            = $complexScheduledActionsForRule
             DeviceThreatProtectionEnabled                      = $devicePolicy.AdditionalProperties.deviceThreatProtectionEnabled
             DeviceThreatProtectionRequiredSecurityLevel        = $devicePolicy.AdditionalProperties.deviceThreatProtectionRequiredSecurityLevel
             AdvancedThreatProtectionRequiredSecurityLevel      = $devicePolicy.AdditionalProperties.advancedThreatProtectionRequiredSecurityLevel
@@ -304,44 +304,44 @@ function Set-TargetResource
 
         [Parameter()]
         [System.String]
-        $minAndroidSecurityPatchLevel,
+        $MinAndroidSecurityPatchLevel,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumLetterCharacters,
+        $PasswordMinimumLetterCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumLowerCaseCharacters,
+        $PasswordMinimumLowerCaseCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumNonLetterCharacters,
+        $PasswordMinimumNonLetterCharacters,
         
         [Parameter()]
         [System.Int32]
-        $passwordMinimumNumericCharacters,
+        $PasswordMinimumNumericCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumSymbolCharacters,
+        $PasswordMinimumSymbolCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumUpperCaseCharacters,
+        $PasswordMinimumUpperCaseCharacters,
 
         [Parameter()]
         [System.Boolean]
-        $requireNoPendingSystemUpdates,
+        $RequireNoPendingSystemUpdates,
 
         [Parameter()]
         [System.String]
         [ValidateSet('basic', 'hardwareBacked')]
-        $securityRequiredAndroidSafetyNetEvaluationType,
+        $SecurityRequiredAndroidSafetyNetEvaluationType,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $scheduledActionsForRule,
+        $ScheduledActionsForRule,
 
         [Parameter()]
         [System.String]
@@ -467,8 +467,8 @@ function Set-TargetResource
 
     #reconstruct scheduled action configurations for use with New/Update-MgBetaDeviceManagementDeviceCompliancePolicy   
     $allTargetValues = Convert-M365DscHashtableToString -Hashtable $PSBoundParameters    
-    $PSBoundParameters.Remove('scheduledActionsForRule') | Out-Null   
-    if ($allTargetValues -match '\bscheduledActionsForRule=\(\{([^\)]+)\}\)') 
+    $PSBoundParameters.Remove('ScheduledActionsForRule') | Out-Null   
+    if ($allTargetValues -match '\bScheduledActionsForRule=\(\{([^\)]+)\}\)') 
     {    
         $scheduledActionConfigurations = @() #define array we'll be adding hashtables to      
         $scheduledActionsForRuleBlock = $matches[1] -split "," -replace "[{}]"        
@@ -579,44 +579,44 @@ function Test-TargetResource
 
         [Parameter()]
         [System.String]
-        $minAndroidSecurityPatchLevel,
+        $MinAndroidSecurityPatchLevel,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumLetterCharacters,
+        $PasswordMinimumLetterCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumLowerCaseCharacters,
+        $PasswordMinimumLowerCaseCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumNonLetterCharacters,
+        $PasswordMinimumNonLetterCharacters,
         
         [Parameter()]
         [System.Int32]
-        $passwordMinimumNumericCharacters,
+        $PasswordMinimumNumericCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumSymbolCharacters,
+        $PasswordMinimumSymbolCharacters,
 
         [Parameter()]
         [System.Int32]
-        $passwordMinimumUpperCaseCharacters,
+        $PasswordMinimumUpperCaseCharacters,
 
         [Parameter()]
         [System.Boolean]
-        $requireNoPendingSystemUpdates,
+        $RequireNoPendingSystemUpdates,
 
         [Parameter()]
         [System.String]
         [ValidateSet('basic', 'hardwareBacked')]
-        $securityRequiredAndroidSafetyNetEvaluationType,
+        $SecurityRequiredAndroidSafetyNetEvaluationType,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $scheduledActionsForRule,
+        $ScheduledActionsForRule,
 
         [Parameter()]
         [System.String]
@@ -898,18 +898,18 @@ function Export-TargetResource
                 }
             }
 
-            if ($Results.scheduledActionsForRule)
+            if ($Results.ScheduledActionsForRule)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.scheduledActionsForRule `
+                    -ComplexObject $Results.ScheduledActionsForRule `
                     -CIMInstanceName MSFT_scheduledActionConfigurations
                 if ($complexTypeStringResult)
                 {
-                    $Results.scheduledActionsForRule = $complexTypeStringResult
+                    $Results.ScheduledActionsForRule = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('scheduledActionsForRule') | Out-Null
+                    $Results.Remove('ScheduledActionsForRule') | Out-Null
                 }
             }
 
@@ -932,14 +932,14 @@ function Export-TargetResource
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'Assignments' -IsCIMArray:$isCIMArray
             }
 
-            if ($Results.scheduledActionsForRule)
+            if ($Results.ScheduledActionsForRule)
             {
                 $isCIMArray = $false
-                if ($Results.scheduledActionsForRule.getType().Fullname -like '*[[\]]')
+                if ($Results.ScheduledActionsForRule.getType().Fullname -like '*[[\]]')
                 {
                     $isCIMArray = $true
                 }
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'scheduledActionsForRule' -IsCIMArray:$isCIMArray
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'ScheduledActionsForRule' -IsCIMArray:$isCIMArray
             }
 
             $dscContent += $currentDSCBlock

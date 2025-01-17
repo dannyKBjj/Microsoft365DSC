@@ -83,56 +83,14 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     SecurityRequireUpToDateSecurityProviders           = $True
                     SecurityRequireCompanyPortalAppIntegrity           = $True
                     MinAndroidSecurityPatchLevel                       = "2024-01-01";
-                    requiredPasswordComplexity                         = "medium";
-                    scheduledActionsForRule                            = [CimInstance[]]@(
-                            (New-CimInstance `
-                            -ClassName MSFT_scheduledActionConfigurations `
-                            -Property @{
-                                actionType = 'block'
-                                notificationTemplateId = '00000000-0000-0000-0000-000000000000'
-                                notificationMessageCcList = @('')
-                                gracePeriodHours = 0
-                            } -ClientOnly)
-                            (New-CimInstance `
-                            -ClassName MSFT_scheduledActionConfigurations `
-                            -Property @{
-                                actionType = 'notification'
-                                notificationTemplateId = 'fakestring0'
-                                notificationMessageCcList = @('00000000-0000-0000-0000-000000000000')
-                                gracePeriodHours = 24
-                            } -ClientOnly)
-                            (New-CimInstance `
-                            -ClassName MSFT_scheduledActionConfigurations `
-                            -Property @{
-                                actionType = 'pushNotification'
-                                notificationTemplateId = '00000000-0000-0000-0000-000000000000'
-                                notificationMessageCcList = @('')
-                                gracePeriodHours = 48
-                            } -ClientOnly)
-                            (New-CimInstance `
-                            -ClassName MSFT_scheduledActionConfigurations `
-                            -Property @{
-                                actionType = 'retire'
-                                notificationTemplateId = '00000000-0000-0000-0000-000000000000'
-                                notificationMessageCcList = @('')
-                                gracePeriodHours = 72
-                            } -ClientOnly)
-                            (New-CimInstance `
-                            -ClassName MSFT_scheduledActionConfigurations `
-                            -Property @{
-                                actionType = 'remoteLock'
-                                notificationTemplateId = '00000000-0000-0000-0000-000000000000'
-                                notificationMessageCcList = @('')
-                                gracePeriodHours = 96
-                            } -ClientOnly)
-                    )
+                    RequiredPasswordComplexity                         = "medium";
                     SecurityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
-                    workProfileInactiveBeforeScreenLockInMinutes       = 480
-                    workProfilePasswordExpirationInDays                = 30
-                    workProfilePasswordMinimumLength                   = 12
-                    workProfilePasswordRequiredType                    = "atLeastNumeric"
-                    workProfilePreviousPasswordBlockCount              = 5
-                    workProfileRequiredPasswordComplexity              = "high"
+                    WorkProfileInactiveBeforeScreenLockInMinutes       = 480
+                    WorkProfilePasswordExpirationInDays                = 30
+                    WorkProfilePasswordMinimumLength                   = 12
+                    WorkProfilePasswordRequiredType                    = "atLeastNumeric"
+                    WorkProfilePreviousPasswordBlockCount              = 5
+                    WorkProfileRequiredPasswordComplexity              = "high"
                     WorkProfileRequirePassword                         = $True
                     Ensure                                             = 'Present'
                     Credential                                         = $Credential
@@ -186,12 +144,12 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     SecurityRequireCompanyPortalAppIntegrity           = $True
                     MinAndroidSecurityPatchLevel                       = "2024-01-01";
                     SecurityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
-                    workProfileInactiveBeforeScreenLockInMinutes       = 480
-                    workProfilePasswordExpirationInDays                = 30
-                    workProfilePasswordMinimumLength                   = 12
-                    workProfilePasswordRequiredType                    = "atLeastNumeric"
-                    workProfilePreviousPasswordBlockCount              = 5
-                    workProfileRequiredPasswordComplexity              = "high"
+                    WorkProfileInactiveBeforeScreenLockInMinutes       = 480
+                    WorkProfilePasswordExpirationInDays                = 30
+                    WorkProfilePasswordMinimumLength                   = 12
+                    WorkProfilePasswordRequiredType                    = "atLeastNumeric"
+                    WorkProfilePreviousPasswordBlockCount              = 5
+                    WorkProfileRequiredPasswordComplexity              = "high"
                     WorkProfileRequirePassword                         = $True
                     Ensure                                             = 'Present'
                     Credential                                         = $Credential
@@ -230,12 +188,12 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             RoleScopeTagIds                                    = '0'
                             MinAndroidSecurityPatchLevel                       = "2024-01-01";
                             SecurityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
-                            workProfileInactiveBeforeScreenLockInMinutes       = 480
-                            workProfilePasswordExpirationInDays                = 30
-                            workProfilePasswordMinimumLength                   = 12
-                            workProfilePasswordRequiredType                    = "atLeastNumeric"
-                            workProfilePreviousPasswordBlockCount              = 5
-                            workProfileRequiredPasswordComplexity              = "high"
+                            WorkProfileInactiveBeforeScreenLockInMinutes       = 480
+                            WorkProfilePasswordExpirationInDays                = 30
+                            WorkProfilePasswordMinimumLength                   = 12
+                            WorkProfilePasswordRequiredType                    = "atLeastNumeric"
+                            WorkProfilePreviousPasswordBlockCount              = 5
+                            WorkProfileRequiredPasswordComplexity              = "high"
                             WorkProfileRequirePassword                         = $True
                         }
                     }
@@ -285,12 +243,12 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     SecurityRequireCompanyPortalAppIntegrity           = $True                   
                     MinAndroidSecurityPatchLevel                       = "2024-01-01";
                     SecurityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
-                    workProfileInactiveBeforeScreenLockInMinutes       = 480
-                    workProfilePasswordExpirationInDays                = 30
-                    workProfilePasswordMinimumLength                   = 12
-                    workProfilePasswordRequiredType                    = "atLeastNumeric"
-                    workProfilePreviousPasswordBlockCount              = 5
-                    workProfileRequiredPasswordComplexity              = "high"
+                    WorkProfileInactiveBeforeScreenLockInMinutes       = 480
+                    WorkProfilePasswordExpirationInDays                = 30
+                    WorkProfilePasswordMinimumLength                   = 12
+                    WorkProfilePasswordRequiredType                    = "atLeastNumeric"
+                    WorkProfilePreviousPasswordBlockCount              = 5
+                    WorkProfileRequiredPasswordComplexity              = "high"
                     WorkProfileRequirePassword                         = $True
                     Ensure                                             = 'Present'
                     Credential                                         = $Credential
@@ -327,15 +285,14 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             SecurityRequireUpToDateSecurityProviders           = $True
                             SecurityRequireCompanyPortalAppIntegrity           = $True
                             RoleScopeTagIds                                    = '0'
-
                             MinAndroidSecurityPatchLevel                       = "2024-01-01";
                             SecurityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
-                            workProfileInactiveBeforeScreenLockInMinutes       = 480
-                            workProfilePasswordExpirationInDays                = 30
-                            workProfilePasswordMinimumLength                   = 12
-                            workProfilePasswordRequiredType                    = "atLeastNumeric"
-                            workProfilePreviousPasswordBlockCount              = 5
-                            workProfileRequiredPasswordComplexity              = "high"
+                            WorkProfileInactiveBeforeScreenLockInMinutes       = 480
+                            WorkProfilePasswordExpirationInDays                = 30
+                            WorkProfilePasswordMinimumLength                   = 12
+                            WorkProfilePasswordRequiredType                    = "atLeastNumeric"
+                            WorkProfilePreviousPasswordBlockCount              = 5
+                            WorkProfileRequiredPasswordComplexity              = "high"
                             WorkProfileRequirePassword                         = $True
                         }
                     }

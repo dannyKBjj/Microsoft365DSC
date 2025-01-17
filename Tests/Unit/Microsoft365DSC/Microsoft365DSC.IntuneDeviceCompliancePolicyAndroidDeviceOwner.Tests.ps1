@@ -75,8 +75,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     PasswordPreviousPasswordCountToBlock               = 10
                     StorageRequireEncryption                           = $True
                     SecurityRequireIntuneAppIntegrity                  = $True
-                    minAndroidSecurityPatchLevel                       = "2024-01-24"
-                    securityRequiredAndroidSafetyNetEvaluationType    = "hardwareBacked"
+                    MinAndroidSecurityPatchLevel                       = "2024-01-24"
+                    SecurityRequiredAndroidSafetyNetEvaluationType     = "hardwareBacked"
                     Ensure                                             = 'Present'
                     Credential                                         = $Credential                    
                 }

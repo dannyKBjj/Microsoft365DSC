@@ -15,25 +15,25 @@ function Get-TargetResource
         [Parameter()]
         [System.String]
         [ValidateSet('none', 'low', 'medium', 'high')]
-        $requiredPasswordComplexity,
+        $RequiredPasswordComplexity,
 
         [Parameter()]
         [System.Boolean]
-        $securityBlockDeviceAdministratorManagedDevices,
+        $SecurityBlockDeviceAdministratorManagedDevices,
 
         [Parameter()]
         [System.String[]]
-        $restrictedApps,
+        $RestrictedApps,
 
         [Parameter()]
         [System.String]
         [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')] #Specifies Android Work Profile password type.
-        $workProfilePasswordRequiredType,
+        $WorkProfilePasswordRequiredType,
 
         [Parameter()]
         [System.String]
         [ValidateSet('None', 'Low', 'Medium', 'High')]
-        $workProfileRequiredPasswordComplexity, 
+        $WorkProfileRequiredPasswordComplexity, 
 
         [Parameter()]
         [System.Boolean]
@@ -41,23 +41,23 @@ function Get-TargetResource
 
         [Parameter()]
         [System.Int32]
-        $workProfilePreviousPasswordBlockCount,
+        $WorkProfilePreviousPasswordBlockCount,
 
         [Parameter()]
         [System.Int32]
-        $workProfileInactiveBeforeScreenLockInMinutes,
+        $WorkProfileInactiveBeforeScreenLockInMinutes,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordMinimumLength,
+        $WorkProfilePasswordMinimumLength,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordExpirationInDays,
+        $WorkProfilePasswordExpirationInDays,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $scheduledActionsForRule,
+        $ScheduledActionsForRule,
 
         [Parameter()]
         [System.Boolean]
@@ -266,17 +266,17 @@ function Get-TargetResource
         $results = @{
             DisplayName                                        = $devicePolicy.DisplayName
             Description                                        = $devicePolicy.Description
-            requiredPasswordComplexity                         = $devicePolicy.AdditionalProperties.requiredPasswordComplexity
-            securityBlockDeviceAdministratorManagedDevices     = $devicePolicy.AdditionalProperties.securityBlockDeviceAdministratorManagedDevices
-            restrictedApps                                     = $devicePolicy.AdditionalProperties.restrictedApps
-            workProfilePasswordRequiredType                    = $devicePolicy.AdditionalProperties.workProfilePasswordRequiredType
-            workProfileRequiredPasswordComplexity              = $devicePolicy.AdditionalProperties.workProfileRequiredPasswordComplexity
+            RequiredPasswordComplexity                         = $devicePolicy.AdditionalProperties.requiredPasswordComplexity
+            SecurityBlockDeviceAdministratorManagedDevices     = $devicePolicy.AdditionalProperties.securityBlockDeviceAdministratorManagedDevices
+            RestrictedApps                                     = $devicePolicy.AdditionalProperties.restrictedApps
+            WorkProfilePasswordRequiredType                    = $devicePolicy.AdditionalProperties.workProfilePasswordRequiredType
+            WorkProfileRequiredPasswordComplexity              = $devicePolicy.AdditionalProperties.workProfileRequiredPasswordComplexity
             WorkProfileRequirePassword                         = $devicePolicy.AdditionalProperties.workProfileRequirePassword
-            workProfilePreviousPasswordBlockCount              = $devicePolicy.AdditionalProperties.workProfilePreviousPasswordBlockCount
-            workProfileInactiveBeforeScreenLockInMinutes       = $devicePolicy.AdditionalProperties.workProfileInactiveBeforeScreenLockInMinutes
-            workProfilePasswordMinimumLength                   = $devicePolicy.AdditionalProperties.workProfilePasswordMinimumLength
-            workProfilePasswordExpirationInDays                = $devicePolicy.AdditionalProperties.workProfilePasswordExpirationInDays
-            scheduledActionsForRule                            = $complexScheduledActionsForRule
+            WorkProfilePreviousPasswordBlockCount              = $devicePolicy.AdditionalProperties.workProfilePreviousPasswordBlockCount
+            WorkProfileInactiveBeforeScreenLockInMinutes       = $devicePolicy.AdditionalProperties.workProfileInactiveBeforeScreenLockInMinutes
+            WorkProfilePasswordMinimumLength                   = $devicePolicy.AdditionalProperties.workProfilePasswordMinimumLength
+            WorkProfilePasswordExpirationInDays                = $devicePolicy.AdditionalProperties.workProfilePasswordExpirationInDays
+            ScheduledActionsForRule                            = $complexScheduledActionsForRule
             PasswordRequired                                   = $devicePolicy.AdditionalProperties.passwordRequired
             PasswordMinimumLength                              = $devicePolicy.AdditionalProperties.passwordMinimumLength
             PasswordRequiredType                               = $devicePolicy.AdditionalProperties.passwordRequiredType
@@ -353,25 +353,25 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         [ValidateSet('none', 'low', 'medium', 'high')]
-        $requiredPasswordComplexity,
+        $RequiredPasswordComplexity,
 
         [Parameter()]
         [System.Boolean]
-        $securityBlockDeviceAdministratorManagedDevices,
+        $SecurityBlockDeviceAdministratorManagedDevices,
 
         [Parameter()]
         [System.String[]]
-        $restrictedApps,
+        $RestrictedApps,
 
         [Parameter()]
         [System.String]
         [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')] #Specifies Android Work Profile password type.
-        $workProfilePasswordRequiredType,
+        $WorkProfilePasswordRequiredType,
 
         [Parameter()]
         [System.String]
         [ValidateSet('None', 'Low', 'Medium', 'High')]
-        $workProfileRequiredPasswordComplexity, 
+        $WorkProfileRequiredPasswordComplexity, 
 
         [Parameter()]
         [System.Boolean]
@@ -379,23 +379,23 @@ function Set-TargetResource
 
         [Parameter()]
         [System.Int32]
-        $workProfilePreviousPasswordBlockCount,
+        $WorkProfilePreviousPasswordBlockCount,
 
         [Parameter()]
         [System.Int32]
-        $workProfileInactiveBeforeScreenLockInMinutes,
+        $WorkProfileInactiveBeforeScreenLockInMinutes,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordMinimumLength,
+        $WorkProfilePasswordMinimumLength,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordExpirationInDays,
+        $WorkProfilePasswordExpirationInDays,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $scheduledActionsForRule,
+        $ScheduledActionsForRule,
 
         [Parameter()]
         [System.Boolean]
@@ -563,8 +563,8 @@ function Set-TargetResource
 
     #reconstruct scheduled action configurations for use with New/Update-MgBetaDeviceManagementDeviceCompliancePolicy   
     $allTargetValues = Convert-M365DscHashtableToString -Hashtable $PSBoundParameters    
-    $PSBoundParameters.Remove('scheduledActionsForRule') | Out-Null   
-    if ($allTargetValues -match '\bscheduledActionsForRule=\(\{([^\)]+)\}\)') 
+    $PSBoundParameters.Remove('ScheduledActionsForRule') | Out-Null   
+    if ($allTargetValues -match '\bScheduledActionsForRule=\(\{([^\)]+)\}\)') 
     {    
         $scheduledActionConfigurations = @() #define array we'll be adding hashtables to      
         $scheduledActionsForRuleBlock = $matches[1] -split "," -replace "[{}]"        
@@ -667,25 +667,25 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         [ValidateSet('none', 'low', 'medium', 'high')]
-        $requiredPasswordComplexity,
+        $RequiredPasswordComplexity,
 
         [Parameter()]
         [System.Boolean]
-        $securityBlockDeviceAdministratorManagedDevices,
+        $SecurityBlockDeviceAdministratorManagedDevices,
 
         [Parameter()]
         [System.String[]]
-        $restrictedApps,
+        $RestrictedApps,
 
         [Parameter()]
         [System.String]
         [ValidateSet('deviceDefault', 'lowSecurityBiometric', 'required', 'atLeastNumeric', 'numericComplex', 'atLeastAlphabetic', 'atLeastAlphanumeric', 'alphanumericWithSymbols')] #Specifies Android Work Profile password type.
-        $workProfilePasswordRequiredType,
+        $WorkProfilePasswordRequiredType,
 
         [Parameter()]
         [System.String]
         [ValidateSet('None', 'Low', 'Medium', 'High')]
-        $workProfileRequiredPasswordComplexity, 
+        $WorkProfileRequiredPasswordComplexity, 
 
         [Parameter()]
         [System.Boolean]
@@ -693,23 +693,23 @@ function Test-TargetResource
 
         [Parameter()]
         [System.Int32]
-        $workProfilePreviousPasswordBlockCount,
+        $WorkProfilePreviousPasswordBlockCount,
 
         [Parameter()]
         [System.Int32]
-        $workProfileInactiveBeforeScreenLockInMinutes,
+        $WorkProfileInactiveBeforeScreenLockInMinutes,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordMinimumLength,
+        $WorkProfilePasswordMinimumLength,
 
         [Parameter()]
         [System.Int32]
-        $workProfilePasswordExpirationInDays,
+        $WorkProfilePasswordExpirationInDays,
 
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
-        $scheduledActionsForRule,
+        $ScheduledActionsForRule,
 
         [Parameter()]
         [System.Boolean]
@@ -1032,18 +1032,18 @@ function Export-TargetResource
                 }
             }
 
-            if ($Results.scheduledActionsForRule)
+            if ($Results.ScheduledActionsForRule)
             {
                 $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
-                    -ComplexObject $Results.scheduledActionsForRule `
+                    -ComplexObject $Results.ScheduledActionsForRule `
                     -CIMInstanceName MSFT_scheduledActionConfigurations
                 if ($complexTypeStringResult)
                 {
-                    $Results.scheduledActionsForRule = $complexTypeStringResult
+                    $Results.ScheduledActionsForRule = $complexTypeStringResult
                 }
                 else
                 {
-                    $Results.Remove('scheduledActionsForRule') | Out-Null
+                    $Results.Remove('ScheduledActionsForRule') | Out-Null
                 }
             }
 
@@ -1065,14 +1065,14 @@ function Export-TargetResource
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'Assignments' -IsCIMArray:$isCIMArray
             }
 
-            if ($Results.scheduledActionsForRule)
+            if ($Results.ScheduledActionsForRule)
             {
                 $isCIMArray = $false
-                if ($Results.scheduledActionsForRule.getType().Fullname -like '*[[\]]')
+                if ($Results.ScheduledActionsForRule.getType().Fullname -like '*[[\]]')
                 {
                     $isCIMArray = $true
                 }
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'scheduledActionsForRule' -IsCIMArray:$isCIMArray
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'ScheduledActionsForRule' -IsCIMArray:$isCIMArray
             }
 
             $dscContent += $currentDSCBlock
