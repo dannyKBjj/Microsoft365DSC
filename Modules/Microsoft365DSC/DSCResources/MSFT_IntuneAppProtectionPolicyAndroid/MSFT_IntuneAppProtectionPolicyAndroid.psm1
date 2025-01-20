@@ -12,6 +12,166 @@ function Get-TargetResource
         [System.String]
         $Description,
 
+#mine
+        [Parameter()]
+        [System.String[]]
+        $AllowedAndroidDeviceModels,
+
+        [Parameter()]
+        [System.Int32]
+        $AllowedOutboundClipboardSharingExceptionLength,
+
+        [Parameter()]
+        [System.Boolean]
+        $BiometricAuthenticationBlocked,
+
+        [Parameter()]
+        [System.Int32]
+        $BlockAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.Boolean]
+        $BlockDataIngestionIntoOrganizationDocuments,
+
+        [Parameter()]
+        [System.Boolean]
+        $ConnectToVpnOnLaunch,
+
+        [Parameter()]
+        [System.String]
+        $CustomDialerAppDisplayName,
+
+        [Parameter()]
+        [System.String]
+        $CustomDialerAppPackageId,
+
+        [Parameter()]
+        [System.Boolean]
+        $DeviceLockRequired,
+
+        [Parameter()]
+        [System.Boolean]
+        $FingerprintAndBiometricEnabled,
+
+        [Parameter()]
+        [System.Boolean]
+        $KeyboardsRestricted,
+
+        [Parameter()]
+        [System.String]
+        $MessagingRedirectAppDisplayName,
+
+        [Parameter()]
+        [System.String]
+        $MessagingRedirectAppPackageId,
+
+        [Parameter()]
+        [System.String]
+        $MinimumWipePatchVersion,
+
+        [Parameter()]
+        [System.Int32]
+        $PreviousPinBlockCount,
+
+        [Parameter()]
+        [System.Int32]
+        $WarnAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.Int32]
+        $WipeAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.String[]]
+        $Alloweddataingestionlocations,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidDeviceManufacturerNotAllowed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidDeviceModelNotAllowed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidSafetyNetAppsVerificationFailed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidSafetyNetDeviceAttestationFailed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfDeviceComplianceRequired,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfDeviceLockNotSet,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfMaximumPinRetriesExceeded,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfUnableToAuthenticateUser,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $MobileThreatDefenseRemediationAction,
+
+        [Parameter()]
+        [ValidateSet("allApps", "managedApps", "customApp", "blocked")]
+        [System.String]
+        $DialerRestrictionLevel,
+
+        [Parameter()]
+        [ValidateSet("notConfigured", "secured", "low", "medium", "high")]
+        [System.String]
+        $MaximumAllowedDeviceThreatLevel,
+
+        [Parameter()]
+        [ValidateSet("allow", "blockOrganizationalData", "block")]
+        [System.String]
+        $NotificationRestriction,
+
+        [Parameter()]
+        [ValidateSet("anyApp", "anyManagedApp", "specificApps", "blocked")]
+        [System.String]
+        $ProtectedMessagingRedirectAppType,
+
+        [Parameter()]
+        [ValidateSet("none", "enabled")]
+        [System.String]
+        $RequiredAndroidSafetyNetAppsVerificationType,
+
+        [Parameter()]
+        [ValidateSet("none", "basicIntegrity", "basicIntegrityAndDeviceCertification")]
+        [System.String]
+        $RequiredAndroidSafetyNetDeviceAttestationType,
+
+        [Parameter()]
+        [ValidateSet("basic", "hardwareBacked")]
+        [System.String]
+        $RequiredAndroidSafetyNetEvaluationType,
+
+        [Parameter()]
+        [ValidateSet("unspecified", "unmanaged", "mdm", "androidEnterprise", "androidEnterpriseDedicatedDevicesWithAzureAdSharedMode", "androidOpenSourceProjectUserAssociated", "androidOpenSourceProjectUserless", "unknownFutureValue")]
+        [System.String]
+        $TargetedAppManagementLevels,
+
+#mine
+
         [Parameter()]
         [System.String]
         $PeriodOfflineBeforeAccessCheck,
@@ -381,6 +541,166 @@ function Set-TargetResource
         [System.String]
         $Description,
 
+#mine
+        [Parameter()]
+        [System.String[]]
+        $AllowedAndroidDeviceModels,
+
+        [Parameter()]
+        [System.Int32]
+        $AllowedOutboundClipboardSharingExceptionLength,
+
+        [Parameter()]
+        [System.Boolean]
+        $BiometricAuthenticationBlocked,
+
+        [Parameter()]
+        [System.Int32]
+        $BlockAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.Boolean]
+        $BlockDataIngestionIntoOrganizationDocuments,
+
+        [Parameter()]
+        [System.Boolean]
+        $ConnectToVpnOnLaunch,
+
+        [Parameter()]
+        [System.String]
+        $CustomDialerAppDisplayName,
+
+        [Parameter()]
+        [System.String]
+        $CustomDialerAppPackageId,
+
+        [Parameter()]
+        [System.Boolean]
+        $DeviceLockRequired,
+
+        [Parameter()]
+        [System.Boolean]
+        $FingerprintAndBiometricEnabled,
+
+        [Parameter()]
+        [System.Boolean]
+        $KeyboardsRestricted,
+
+        [Parameter()]
+        [System.String]
+        $MessagingRedirectAppDisplayName,
+
+        [Parameter()]
+        [System.String]
+        $MessagingRedirectAppPackageId,
+
+        [Parameter()]
+        [System.String]
+        $MinimumWipePatchVersion,
+
+        [Parameter()]
+        [System.Int32]
+        $PreviousPinBlockCount,
+
+        [Parameter()]
+        [System.Int32]
+        $WarnAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.Int32]
+        $WipeAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.String[]]
+        $Alloweddataingestionlocations,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidDeviceManufacturerNotAllowed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidDeviceModelNotAllowed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidSafetyNetAppsVerificationFailed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidSafetyNetDeviceAttestationFailed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfDeviceComplianceRequired,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfDeviceLockNotSet,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfMaximumPinRetriesExceeded,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfUnableToAuthenticateUser,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $MobileThreatDefenseRemediationAction,
+
+        [Parameter()]
+        [ValidateSet("allApps", "managedApps", "customApp", "blocked")]
+        [System.String]
+        $DialerRestrictionLevel,
+
+        [Parameter()]
+        [ValidateSet("notConfigured", "secured", "low", "medium", "high")]
+        [System.String]
+        $MaximumAllowedDeviceThreatLevel,
+
+        [Parameter()]
+        [ValidateSet("allow", "blockOrganizationalData", "block")]
+        [System.String]
+        $NotificationRestriction,
+
+        [Parameter()]
+        [ValidateSet("anyApp", "anyManagedApp", "specificApps", "blocked")]
+        [System.String]
+        $ProtectedMessagingRedirectAppType,
+
+        [Parameter()]
+        [ValidateSet("none", "enabled")]
+        [System.String]
+        $RequiredAndroidSafetyNetAppsVerificationType,
+
+        [Parameter()]
+        [ValidateSet("none", "basicIntegrity", "basicIntegrityAndDeviceCertification")]
+        [System.String]
+        $RequiredAndroidSafetyNetDeviceAttestationType,
+
+        [Parameter()]
+        [ValidateSet("basic", "hardwareBacked")]
+        [System.String]
+        $RequiredAndroidSafetyNetEvaluationType,
+
+        [Parameter()]
+        [ValidateSet("unspecified", "unmanaged", "mdm", "androidEnterprise", "androidEnterpriseDedicatedDevicesWithAzureAdSharedMode", "androidOpenSourceProjectUserAssociated", "androidOpenSourceProjectUserless", "unknownFutureValue")]
+        [System.String]
+        $TargetedAppManagementLevels,
+
+#mine
+
         [Parameter()]
         [System.String]
         $PeriodOfflineBeforeAccessCheck,
@@ -733,6 +1053,166 @@ function Test-TargetResource
         [System.String]
         $Description,
 
+#mine
+        [Parameter()]
+        [System.String[]]
+        $AllowedAndroidDeviceModels,
+
+        [Parameter()]
+        [System.Int32]
+        $AllowedOutboundClipboardSharingExceptionLength,
+
+        [Parameter()]
+        [System.Boolean]
+        $BiometricAuthenticationBlocked,
+
+        [Parameter()]
+        [System.Int32]
+        $BlockAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.Boolean]
+        $BlockDataIngestionIntoOrganizationDocuments,
+
+        [Parameter()]
+        [System.Boolean]
+        $ConnectToVpnOnLaunch,
+
+        [Parameter()]
+        [System.String]
+        $CustomDialerAppDisplayName,
+
+        [Parameter()]
+        [System.String]
+        $CustomDialerAppPackageId,
+
+        [Parameter()]
+        [System.Boolean]
+        $DeviceLockRequired,
+
+        [Parameter()]
+        [System.Boolean]
+        $FingerprintAndBiometricEnabled,
+
+        [Parameter()]
+        [System.Boolean]
+        $KeyboardsRestricted,
+
+        [Parameter()]
+        [System.String]
+        $MessagingRedirectAppDisplayName,
+
+        [Parameter()]
+        [System.String]
+        $MessagingRedirectAppPackageId,
+
+        [Parameter()]
+        [System.String]
+        $MinimumWipePatchVersion,
+
+        [Parameter()]
+        [System.Int32]
+        $PreviousPinBlockCount,
+
+        [Parameter()]
+        [System.Int32]
+        $WarnAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.Int32]
+        $WipeAfterCompanyPortalUpdateDeferralInDays,
+
+        [Parameter()]
+        [System.String[]]
+        $Alloweddataingestionlocations,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidDeviceManufacturerNotAllowed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidDeviceModelNotAllowed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidSafetyNetAppsVerificationFailed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfAndroidSafetyNetDeviceAttestationFailed,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfDeviceComplianceRequired,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfDeviceLockNotSet,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfMaximumPinRetriesExceeded,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $AppActionIfUnableToAuthenticateUser,
+
+        [Parameter()]
+        [System.String]
+        [ValidateSet("block", "wipe", "warn", "blockWhenSettingIsSupported")]
+        $MobileThreatDefenseRemediationAction,
+
+        [Parameter()]
+        [ValidateSet("allApps", "managedApps", "customApp", "blocked")]
+        [System.String]
+        $DialerRestrictionLevel,
+
+        [Parameter()]
+        [ValidateSet("notConfigured", "secured", "low", "medium", "high")]
+        [System.String]
+        $MaximumAllowedDeviceThreatLevel,
+
+        [Parameter()]
+        [ValidateSet("allow", "blockOrganizationalData", "block")]
+        [System.String]
+        $NotificationRestriction,
+
+        [Parameter()]
+        [ValidateSet("anyApp", "anyManagedApp", "specificApps", "blocked")]
+        [System.String]
+        $ProtectedMessagingRedirectAppType,
+
+        [Parameter()]
+        [ValidateSet("none", "enabled")]
+        [System.String]
+        $RequiredAndroidSafetyNetAppsVerificationType,
+
+        [Parameter()]
+        [ValidateSet("none", "basicIntegrity", "basicIntegrityAndDeviceCertification")]
+        [System.String]
+        $RequiredAndroidSafetyNetDeviceAttestationType,
+
+        [Parameter()]
+        [ValidateSet("basic", "hardwareBacked")]
+        [System.String]
+        $RequiredAndroidSafetyNetEvaluationType,
+
+        [Parameter()]
+        [ValidateSet("unspecified", "unmanaged", "mdm", "androidEnterprise", "androidEnterpriseDedicatedDevicesWithAzureAdSharedMode", "androidOpenSourceProjectUserAssociated", "androidOpenSourceProjectUserless", "unknownFutureValue")]
+        [System.String]
+        $TargetedAppManagementLevels,
+
+#mine
+
         [Parameter()]
         [System.String]
         $PeriodOfflineBeforeAccessCheck,
@@ -936,6 +1416,19 @@ function Test-TargetResource
         [System.String[]]
         $AccessTokens
     )
+
+
+
+
+
+
+
+
+
+
+
+
+
     #Ensure the proper dependencies are installed in the current environment.
     Confirm-M365DSCDependencies
 
@@ -1361,57 +1854,96 @@ function Set-ManagedBrowserValues
 function Get-InputParameters
 {
     return @{
-        AllowedDataStorageLocations                     = @{Type = 'Parameter'        ; ExportFileType = 'Array'; }
-        AllowedInboundDataTransferSources               = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
-        AllowedOutboundClipboardSharingLevel            = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
-        AllowedOutboundDataTransferDestinations         = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
-        ApplicationId                                   = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
-        ApplicationSecret                               = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
-        AppGroupType                                    = @{Type = 'ComplexParameter' ; ExportFileType = 'String'; }
-        Apps                                            = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        Assignments                                     = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        CertificateThumbprint                           = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
-        Managedidentity                                 = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        ContactSyncBlocked                              = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        Credential                                      = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
-        CustomBrowserDisplayName                        = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        CustomBrowserPackageId                          = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        DataBackupBlocked                               = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        Description                                     = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        DeviceComplianceRequired                        = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        DisableAppEncryptionIfDeviceEncryptionIsEnabled = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        DisableAppPinIfDevicePinIsSet                   = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        DisplayName                                     = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        EncryptAppData                                  = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        Ensure                                          = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        ExcludedGroups                                  = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        FingerprintBlocked                              = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        Id                                              = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        IsAssigned                                      = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        ManagedBrowser                                  = @{Type = 'ComplexParameter' ; ExportFileType = 'String'; }
-        ManagedBrowserToOpenLinksRequired               = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
-        MaximumPinRetries                               = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        MinimumPinLength                                = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        MinimumRequiredAppVersion                       = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        MinimumRequiredOSVersion                        = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        MinimumRequiredPatchVersion                     = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        MinimumWarningAppVersion                        = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        MinimumWarningOSVersion                         = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        MinimumWarningPatchVersion                      = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        OrganizationalCredentialsRequired               = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        PeriodBeforePinReset                            = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
-        PeriodOfflineBeforeAccessCheck                  = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
-        PeriodOfflineBeforeWipeIsEnforced               = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
-        PeriodOnlineBeforeAccessCheck                   = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
-        PinCharacterSet                                 = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
-        PinRequired                                     = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        PrintBlocked                                    = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        RequireClass3Biometrics                         = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        RequirePinAfterBiometricChange                  = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        SaveAsBlocked                                   = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        ScreenCaptureBlocked                            = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        SimplePinBlocked                                = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
-        TenantId                                        = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
+#mine
+        AllowedAndroidDeviceModels                         = @{Type = 'Parameter'; ExportFileType = 'Array'; }
+        AllowedOutboundClipboardSharingExceptionLength     = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        BiometricAuthenticationBlocked                     = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        BlockAfterCompanyPortalUpdateDeferralInDays        = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        BlockDataIngestionIntoOrganizationDocuments        = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        ConnectToVpnOnLaunch                               = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        CustomDialerAppDisplayName                         = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        CustomDialerAppPackageId                           = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        DeviceLockRequired                                 = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        FingerprintAndBiometricEnabled                     = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        KeyboardsRestricted                                = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        MessagingRedirectAppDisplayName                    = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        MessagingRedirectAppPackageId                      = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        MinimumWipePatchVersion                            = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        PreviousPinBlockCount                              = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        WarnAfterCompanyPortalUpdateDeferralInDays         = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        WipeAfterCompanyPortalUpdateDeferralInDays         = @{Type = 'Parameter'; ExportFileType = 'NA'; }
+        Alloweddataingestionlocations                      = @{Type = 'Parameter'; ExportFileType = 'Array'; }
+        AppActionIfAndroidDeviceManufacturerNotAllowed     = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        AppActionIfAndroidDeviceModelNotAllowed            = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        AppActionIfAndroidSafetyNetAppsVerificationFailed  = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        AppActionIfAndroidSafetyNetDeviceAttestationFailed = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        AppActionIfDeviceComplianceRequired                = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        AppActionIfDeviceLockNotSet                        = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        AppActionIfMaximumPinRetriesExceeded               = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        AppActionIfUnableToAuthenticateUser                = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        MobileThreatDefenseRemediationAction               = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        DialerRestrictionLevel                             = @{Type = 'Parameter'; ExportFileType = 'String'; }
+
+        MaximumAllowedDeviceThreatLevel                    = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        NotificationRestriction                            = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        ProtectedMessagingRedirectAppType                  = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        RequiredAndroidSafetyNetAppsVerificationType       = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        RequiredAndroidSafetyNetDeviceAttestationType      = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        RequiredAndroidSafetyNetEvaluationType             = @{Type = 'Parameter'; ExportFileType = 'String'; }
+        TargetedAppManagementLevels                        = @{Type = 'Parameter'; ExportFileType = 'String'; }
+
+#mine
+        AllowedDataStorageLocations                        = @{Type = 'Parameter'        ; ExportFileType = 'Array'; }
+        AllowedInboundDataTransferSources                  = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
+        AllowedOutboundClipboardSharingLevel               = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
+        AllowedOutboundDataTransferDestinations            = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
+        ApplicationId                                      = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
+        ApplicationSecret                                  = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
+        AppGroupType                                       = @{Type = 'ComplexParameter' ; ExportFileType = 'String'; }
+        Apps                                               = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        Assignments                                        = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        CertificateThumbprint                              = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
+        Managedidentity                                    = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        ContactSyncBlocked                                 = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        Credential                                         = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
+        CustomBrowserDisplayName                           = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        CustomBrowserPackageId                             = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        DataBackupBlocked                                  = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        Description                                        = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        DeviceComplianceRequired                           = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        DisableAppEncryptionIfDeviceEncryptionIsEnabled    = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        DisableAppPinIfDevicePinIsSet                      = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        DisplayName                                        = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        EncryptAppData                                     = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        Ensure                                             = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        ExcludedGroups                                     = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        FingerprintBlocked                                 = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        Id                                                 = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        IsAssigned                                         = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        ManagedBrowser                                     = @{Type = 'ComplexParameter' ; ExportFileType = 'String'; }
+        ManagedBrowserToOpenLinksRequired                  = @{Type = 'ComplexParameter' ; ExportFileType = 'NA'; }
+        MaximumPinRetries                                  = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        MinimumPinLength                                   = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        MinimumRequiredAppVersion                          = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        MinimumRequiredOSVersion                           = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        MinimumRequiredPatchVersion                        = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        MinimumWarningAppVersion                           = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        MinimumWarningOSVersion                            = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        MinimumWarningPatchVersion                         = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        OrganizationalCredentialsRequired                  = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        PeriodBeforePinReset                               = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
+        PeriodOfflineBeforeAccessCheck                     = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
+        PeriodOfflineBeforeWipeIsEnforced                  = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
+        PeriodOnlineBeforeAccessCheck                      = @{Type = 'Parameter'        ; ExportFileType = 'Duration'; }
+        PinCharacterSet                                    = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
+        PinRequired                                        = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        PrintBlocked                                       = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        RequireClass3Biometrics                            = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        RequirePinAfterBiometricChange                     = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        SaveAsBlocked                                      = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        ScreenCaptureBlocked                               = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        SimplePinBlocked                                   = @{Type = 'Parameter'        ; ExportFileType = 'NA'; }
+        TenantId                                           = @{Type = 'Credential'       ; ExportFileType = 'NA'; }
     }
 }
 
