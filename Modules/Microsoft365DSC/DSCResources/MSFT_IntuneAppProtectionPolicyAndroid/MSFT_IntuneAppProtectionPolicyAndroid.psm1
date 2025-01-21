@@ -12,7 +12,6 @@ function Get-TargetResource
         [System.String]
         $Description,
 
-#mine
         [Parameter()]
         [System.String[]]
         $AllowedAndroidDeviceModels,
@@ -170,7 +169,13 @@ function Get-TargetResource
         [System.String]
         $TargetedAppManagementLevels,
 
-#mine
+        [Parameter()]
+        [System.String[]]
+        $ApprovedKeyboards,
+
+        [Parameter()]
+        [System.String[]]
+        $ExemptedAppPackages,
 
         [Parameter()]
         [System.String]
@@ -459,6 +464,7 @@ function Get-TargetResource
                 }
             }
         }
+
         $Allparams = get-InputParameters
         $policy = @{}
 
@@ -505,6 +511,25 @@ function Get-TargetResource
         $policy.add('CustomBrowserDisplayName', $policyInfo.CustomBrowserDisplayName)
         $policy.add('CustomBrowserPackageId', $policyInfo.CustomBrowserPackageId)
         $policy.add('AccessTokens', $AccessTokens)
+        
+        #convert keyvaluepairs to array
+        $approvedKeyboardArray = @()
+        foreach ($keyboard in $policyInfo.approvedKeyboards){
+            $approvedKeyboardArray += $keyboard.Name +'|' + $keyboard.Value
+        }
+        if($approvedKeyboardArray.Count -gt 0)
+        {
+            $policy.ApprovedKeyboards = $approvedKeyboardArray
+        }
+        
+        $exemptedAppPackagesArray = @()
+        foreach ($exemptedapppackage in $policyInfo.exemptedAppPackages){
+            $exemptedAppPackagesArray += $exemptedapppackage.Name +'|' + $exemptedapppackage.Value
+        }
+        if($exemptedAppPackagesArray.Count -gt 0)
+        {
+            $policy.ExemptedAppPackages = $exemptedAppPackagesArray
+        }
 
         return $policy
     }
@@ -541,7 +566,6 @@ function Set-TargetResource
         [System.String]
         $Description,
 
-#mine
         [Parameter()]
         [System.String[]]
         $AllowedAndroidDeviceModels,
@@ -699,7 +723,13 @@ function Set-TargetResource
         [System.String]
         $TargetedAppManagementLevels,
 
-#mine
+        [Parameter()]
+        [System.String[]]
+        $ApprovedKeyboards,
+
+        [Parameter()]
+        [System.String[]]
+        $ExemptedAppPackages,
 
         [Parameter()]
         [System.String]
@@ -987,6 +1017,45 @@ function Set-TargetResource
         $configstring += ( 'ExcludedGroups' + ":`r`n" + ($PSBoundParameters.ExcludedGroups | Out-String) + "`r`n" )
 
     }
+
+    #rebuild array as a MicrosoftGraphKeyValuePair hash table for ApprovedKeyboards
+    if ($PSBoundParameters.keys -contains 'ApprovedKeyboards' )
+    {
+        $approvedKeyboardHastableArray = @()
+        $PSBoundParameters.ApprovedKeyboards | ForEach-Object {
+            if ($_ -ne $null)
+            {               
+                $tempArray = @()
+                $tempArray = $_ -split '[|]'
+                $tempHash = @{}
+                $tempHash.Add('name', $tempArray[0])
+                $tempHash.Add('value', $tempArray[1])
+                $approvedKeyboardHastableArray += $tempHash             
+            }
+        }
+        $configstring += ( 'ApprovedKeyboards' + ":`r`n" + ($PSBoundParameters.ApprovedKeyboards | Out-String) + "`r`n" )
+        $setParams.ApprovedKeyboards = $approvedKeyboardHastableArray
+    }
+
+    #rebuild array as a MicrosoftGraphKeyValuePair hash table for ExemptedAppPackages
+    if ($PSBoundParameters.keys -contains 'ExemptedAppPackages' )
+    {
+        $exemptedAppPackagesHastableArray = @()
+        $PSBoundParameters.ExemptedAppPackages | ForEach-Object {
+            if ($_ -ne $null)
+            {               
+                $tempArray = @()
+                $tempArray = $_ -split '[|]'
+                $tempHash = @{}
+                $tempHash.Add('name', $tempArray[0])
+                $tempHash.Add('value', $tempArray[1])
+                $exemptedAppPackagesHastableArray += $tempHash             
+            }
+        }
+        $configstring += ( 'ExemptedAppPackages' + ":`r`n" + ($PSBoundParameters.ExemptedAppPackages | Out-String) + "`r`n" )
+        $setParams.ExemptedAppPackages = $exemptedAppPackagesHastableArray
+    }
+ 
     # set the apps values
     $AppsHash = set-AppsHash -AppGroupType $AppGroupType -apps $apps
     $appshash.Apps | ForEach-Object {
@@ -1053,7 +1122,6 @@ function Test-TargetResource
         [System.String]
         $Description,
 
-#mine
         [Parameter()]
         [System.String[]]
         $AllowedAndroidDeviceModels,
@@ -1211,7 +1279,13 @@ function Test-TargetResource
         [System.String]
         $TargetedAppManagementLevels,
 
-#mine
+        [Parameter()]
+        [System.String[]]
+        $ApprovedKeyboards,
+
+        [Parameter()]
+        [System.String[]]
+        $ExemptedAppPackages,
 
         [Parameter()]
         [System.String]
@@ -1416,18 +1490,6 @@ function Test-TargetResource
         [System.String[]]
         $AccessTokens
     )
-
-
-
-
-
-
-
-
-
-
-
-
 
     #Ensure the proper dependencies are installed in the current environment.
     Confirm-M365DSCDependencies
@@ -1854,7 +1916,6 @@ function Set-ManagedBrowserValues
 function Get-InputParameters
 {
     return @{
-#mine
         AllowedAndroidDeviceModels                         = @{Type = 'Parameter'; ExportFileType = 'Array'; }
         AllowedOutboundClipboardSharingExceptionLength     = @{Type = 'Parameter'; ExportFileType = 'NA'; }
         BiometricAuthenticationBlocked                     = @{Type = 'Parameter'; ExportFileType = 'NA'; }
@@ -1883,7 +1944,6 @@ function Get-InputParameters
         AppActionIfUnableToAuthenticateUser                = @{Type = 'Parameter'; ExportFileType = 'String'; }
         MobileThreatDefenseRemediationAction               = @{Type = 'Parameter'; ExportFileType = 'String'; }
         DialerRestrictionLevel                             = @{Type = 'Parameter'; ExportFileType = 'String'; }
-
         MaximumAllowedDeviceThreatLevel                    = @{Type = 'Parameter'; ExportFileType = 'String'; }
         NotificationRestriction                            = @{Type = 'Parameter'; ExportFileType = 'String'; }
         ProtectedMessagingRedirectAppType                  = @{Type = 'Parameter'; ExportFileType = 'String'; }
@@ -1891,8 +1951,8 @@ function Get-InputParameters
         RequiredAndroidSafetyNetDeviceAttestationType      = @{Type = 'Parameter'; ExportFileType = 'String'; }
         RequiredAndroidSafetyNetEvaluationType             = @{Type = 'Parameter'; ExportFileType = 'String'; }
         TargetedAppManagementLevels                        = @{Type = 'Parameter'; ExportFileType = 'String'; }
-
-#mine
+        ApprovedKeyboards                                  = @{Type = 'Parameter'; ExportFileType = 'ComplexParameter'; }
+        ExemptedAppPackages                                = @{Type = 'Parameter'; ExportFileType = 'ComplexParameter'; }
         AllowedDataStorageLocations                        = @{Type = 'Parameter'        ; ExportFileType = 'Array'; }
         AllowedInboundDataTransferSources                  = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
         AllowedOutboundClipboardSharingLevel               = @{Type = 'Parameter'        ; ExportFileType = 'String'; }
