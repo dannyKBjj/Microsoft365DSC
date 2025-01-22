@@ -60,3 +60,4 @@ class MSFT_IntuneDeviceCompliancePolicyAndroidDeviceOwner : OMI_BaseResource
     [Write, Description("Managed ID being used for authentication.")] Boolean ManagedIdentity;
     [Write, Description("Access token used for authentication.")] String AccessTokens[];
 };
+
