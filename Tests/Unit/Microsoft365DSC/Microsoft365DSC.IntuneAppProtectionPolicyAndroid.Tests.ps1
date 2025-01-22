@@ -31,52 +31,71 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     [string]$description
                 )
                 return @{
-                    AllowedDataStorageLocations                     = @('sharePoint')
-                    AllowedInboundDataTransferSources               = 'managedApps'
-                    AllowedOutboundClipboardSharingLevel            = 'managedAppsWithPasteIn'
-                    AllowedOutboundDataTransferDestinations         = 'managedApps'
-                    AppGroupType                                    = 'selectedPublicApps'
-                    Apps                                            = @('com.cisco.im.intune', 'com.penlink.penpoint', 'com.slack.intune')
-                    Assignments                                     = @('6ee86c9f-2b3c-471d-ad38-ff4673ed723e')
-                    ContactSyncBlocked                              = $False
-                    DataBackupBlocked                               = $False
-                    Description                                     = 'DSC Policy'
-                    DeviceComplianceRequired                        = $True
-                    DisableAppEncryptionIfDeviceEncryptionIsEnabled = $True
-                    EncryptAppData                                  = $True
-                    DisplayName                                     = 'DSC Policy'
-                    Ensure                                          = 'Present'
-                    ExcludedGroups                                  = @('3eacc231-d77b-4efb-bb5f-310f68bd6198')
-                    FingerprintBlocked                              = $False
-                    Credential                                      = $Credential
-                    ManagedBrowserToOpenLinksRequired               = $True
-                    MaximumPinRetries                               = 5
-                    MinimumPinLength                                = 4
-                    OrganizationalCredentialsRequired               = $False
-                    PeriodBeforePinReset                            = 'P60D'
-                    PeriodOfflineBeforeAccessCheck                  = 'PT12H'
-                    PeriodOfflineBeforeWipeIsEnforced               = 'P90D'
-                    PeriodOnlineBeforeAccessCheck                   = 'PT30M'
-                    PinCharacterSet                                 = 'alphanumericAndSymbol'
-                    PinRequired                                     = $True
-                    DisableAppPinIfDevicePinIsSet                   = $False
-                    PrintBlocked                                    = $False
-                    RequireClass3Biometrics                         = $False
-                    RequirePinAfterBiometricChange                  = $False
-                    SaveAsBlocked                                   = $True
-                    SimplePinBlocked                                = $False
-                    ScreenCaptureBlocked                            = $False
-                    ManagedBrowser                                  = 'microsoftEdge'
-                    MinimumRequiredAppVersion                       = '1.2'
-                    MinimumRequiredOSVersion                        = '1.1'
-                    MinimumRequiredPatchVersion                     = '2020-07-13'
-                    MinimumWarningAppVersion                        = '1.5'
-                    MinimumWarningOSVersion                         = '1.5'
-                    MinimumWarningPatchVersion                      = '2021-07-13'
-                    IsAssigned                                      = $True
-                    CustomBrowserPackageId                          = ''
-                    CustomBrowserDisplayName                        = ''
-                    id                                              = '12345-12345-12345-12345-12345'
+                    AllowedDataStorageLocations                        = @('sharePoint')
+                    AllowedInboundDataTransferSources                  = 'managedApps'
+                    AllowedOutboundClipboardSharingLevel               = 'managedAppsWithPasteIn'
+                    AllowedOutboundDataTransferDestinations            = 'managedApps'
+                    AppGroupType                                       = 'selectedPublicApps'
+                    Apps                                               = @('com.cisco.im.intune', 'com.penlink.penpoint', 'com.slack.intune')
+                    Assignments                                        = @('6ee86c9f-2b3c-471d-ad38-ff4673ed723e')
+                    ContactSyncBlocked                                 = $False
+                    DataBackupBlocked                                  = $False
+                    Description                                        = 'DSC Policy'
+                    DeviceComplianceRequired                           = $True
+                    DisableAppEncryptionIfDeviceEncryptionIsEnabled    = $True
+                    EncryptAppData                                     = $True
+                    DisplayName                                        = 'DSC Policy'
+                    Ensure                                             = 'Present'
+                    ExcludedGroups                                     = @('3eacc231-d77b-4efb-bb5f-310f68bd6198')
+                    FingerprintBlocked                                 = $False
+                    Credential                                         = $Credential
+                    ManagedBrowserToOpenLinksRequired                  = $True
+                    MaximumPinRetries                                  = 5
+                    MinimumPinLength                                   = 4
+                    OrganizationalCredentialsRequired                  = $False
+                    PeriodBeforePinReset                               = 'P60D'
+                    PeriodOfflineBeforeAccessCheck                     = 'PT12H'
+                    PeriodOfflineBeforeWipeIsEnforced                  = 'P90D'
+                    PeriodOnlineBeforeAccessCheck                      = 'PT30M'
+                    PinCharacterSet                                    = 'alphanumericAndSymbol'
+                    PinRequired                                        = $True
+                    DisableAppPinIfDevicePinIsSet                      = $False
+                    PrintBlocked                                       = $False
+                    RequireClass3Biometrics                            = $False
+                    RequirePinAfterBiometricChange                     = $False
+                    SaveAsBlocked                                      = $True
+                    SimplePinBlocked                                   = $False
+                    ScreenCaptureBlocked                               = $False
+                    ManagedBrowser                                     = 'microsoftEdge'
+                    MinimumRequiredAppVersion                          = '1.2'
+                    MinimumRequiredOSVersion                           = '1.1'
+                    MinimumRequiredPatchVersion                        = '2020-07-13'
+                    MinimumWarningAppVersion                           = '1.5'
+                    MinimumWarningOSVersion                            = '1.5'
+                    MinimumWarningPatchVersion                         = '2021-07-13'
+                    IsAssigned                                         = $True
+                    CustomBrowserPackageId                             = ''
+                    CustomBrowserDisplayName                           = ''
+                    id                                                 = '12345-12345-12345-12345-12345'
+                    AllowedDataIngestionLocations                      = @('oneDriveForBusiness','sharePoint','camera')
+                    AppActionIfAndroidDeviceManufacturerNotAllowed     = 'block'
+                    AppActionIfAndroidDeviceModelNotAllowed            = 'block'
+                    AppActionIfAndroidSafetyNetAppsVerificationFailed  = 'block'
+                    AppActionIfAndroidSafetyNetDeviceAttestationFailed = 'block'
+                    AppActionIfDeviceComplianceRequired                = 'block'
+                    AppActionIfDeviceLockNotSet                        = 'block'
+                    AppActionIfMaximumPinRetriesExceeded               = 'block'
+                   DialerRestrictionLevel                             = 'allApps'
+                    MaximumAllowedDeviceThreatLevel                    = 'low'
+                    MobileThreatDefenseRemediationAction               = 'block'
+                    NotificationRestriction                            = 'block'
+ #                   ProtectedMessagingRedirectAppType                  = 'anyApp'
+                    RequiredAndroidSafetyNetAppsVerificationType       = 'enabled'
+                    RequiredAndroidSafetyNetDeviceAttestationType      = 'basicIntegrityAndDeviceCertification'
+                    RequiredAndroidSafetyNetEvaluationType             = 'basic'
+                    TargetedAppManagementLevels                        = 'unspecified'
+ #                   ApprovedKeyboards                                  = @('fakestring|fakestring')
+  #                  ExemptedAppPackages                                = @('fakestring|fakestring')
                 }
 
             }
@@ -87,15 +106,15 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     [string]$description
                 )
                 return @{
-                    displayName                                     = 'DSC Policy'
-                    id                                              = '12345-12345-12345-12345-12345'
-                    '@odata.type'                                   = '#microsoft.graph.androidManagedAppProtection'
-                    AllowedDataStorageLocations                     = @('sharePoint')
-                    AllowedInboundDataTransferSources               = 'managedApps'
-                    AllowedOutboundClipboardSharingLevel            = 'managedAppsWithPasteIn'
-                    AllowedOutboundDataTransferDestinations         = 'managedApps'
-                    AppGroupType                                    = 'selectedPublicApps'
-                    Apps                                            = @(
+                    displayName                                        = 'DSC Policy'
+                    id                                                 = '12345-12345-12345-12345-12345'
+                    '@odata.type'                                      = '#microsoft.graph.androidManagedAppProtection'
+                    AllowedDataStorageLocations                        = @('sharePoint')
+                    AllowedInboundDataTransferSources                  = 'managedApps'
+                    AllowedOutboundClipboardSharingLevel               = 'managedAppsWithPasteIn'
+                    AllowedOutboundDataTransferDestinations            = 'managedApps'
+                    AppGroupType                                       = 'selectedPublicApps'
+                    Apps                                               = @(
                         [pscustomobject]@{
                             id                  = 'com.cisco.im.intune.android'
                             mobileAppIdentifier = @{
@@ -124,7 +143,7 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             }
                         }
                     )
-                    Assignments                                     = @(
+                    Assignments                                        = @(
                         @{
                             id     = '6ee86c9f-2b3c-471d-ad38-ff4673ed723e'
                             target = @{
@@ -144,40 +163,69 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             }
                         }
                     )
-                    ContactSyncBlocked                              = $False
-                    DataBackupBlocked                               = $False
-                    Description                                     = 'DSC Policy'
-                    DeviceComplianceRequired                        = $True
-                    DisableAppEncryptionIfDeviceEncryptionIsEnabled = $true
-                    EncryptAppData                                  = $True
-                    FingerprintBlocked                              = $False
-                    ManagedBrowserToOpenLinksRequired               = $True
-                    MaximumPinRetries                               = 5
-                    MinimumPinLength                                = 4
-                    OrganizationalCredentialsRequired               = $False
-                    PeriodBeforePinReset                            = New-TimeSpan -Days 60
-                    PeriodOfflineBeforeAccessCheck                  = New-TimeSpan -Hours 12
-                    PeriodOfflineBeforeWipeIsEnforced               = New-TimeSpan -Days 90
-                    PeriodOnlineBeforeAccessCheck                   = New-TimeSpan -Minutes 30
-                    PinCharacterSet                                 = 'alphanumericAndSymbol'
-                    PinRequired                                     = $True
-                    DisableAppPinIfDevicePinIsSet                   = $False
-                    PrintBlocked                                    = $False
-                    RequireClass3Biometrics                         = $False
-                    RequirePinAfterBiometricChange                  = $False
-                    SaveAsBlocked                                   = $True
-                    SimplePinBlocked                                = $False
-                    ScreenCaptureBlocked                            = $False
-                    ManagedBrowser                                  = 'microsoftEdge'
-                    MinimumRequiredAppVersion                       = '1.2'
-                    MinimumRequiredOSVersion                        = '1.1'
-                    MinimumRequiredPatchVersion                     = '2020-07-13'
-                    MinimumWarningAppVersion                        = '1.5'
-                    MinimumWarningOSVersion                         = '1.5'
-                    MinimumWarningPatchVersion                      = '2021-07-13'
-                    IsAssigned                                      = $True
-                    CustomBrowserPackageId                          = ''
-                    CustomBrowserDisplayName                        = ''
+                    ContactSyncBlocked                                 = $False
+                    DataBackupBlocked                                  = $False
+                    Description                                        = 'DSC Policy'
+                    DeviceComplianceRequired                           = $True
+                    DisableAppEncryptionIfDeviceEncryptionIsEnabled    = $true
+                    EncryptAppData                                     = $True
+                    FingerprintBlocked                                 = $False
+                    ManagedBrowserToOpenLinksRequired                  = $True
+                    MaximumPinRetries                                  = 5
+                    MinimumPinLength                                   = 4
+                    OrganizationalCredentialsRequired                  = $False
+                    PeriodBeforePinReset                               = New-TimeSpan -Days 60
+                    PeriodOfflineBeforeAccessCheck                     = New-TimeSpan -Hours 12
+                    PeriodOfflineBeforeWipeIsEnforced                  = New-TimeSpan -Days 90
+                    PeriodOnlineBeforeAccessCheck                      = New-TimeSpan -Minutes 30
+                    PinCharacterSet                                    = 'alphanumericAndSymbol'
+                    PinRequired                                        = $True
+                    DisableAppPinIfDevicePinIsSet                      = $False
+                    PrintBlocked                                       = $False
+                    RequireClass3Biometrics                            = $False
+                    RequirePinAfterBiometricChange                     = $False
+                    SaveAsBlocked                                      = $True
+                    SimplePinBlocked                                   = $False
+                    ScreenCaptureBlocked                               = $False
+                    ManagedBrowser                                     = 'microsoftEdge'
+                    MinimumRequiredAppVersion                          = '1.2'
+                    MinimumRequiredOSVersion                           = '1.1'
+                    MinimumRequiredPatchVersion                        = '2020-07-13'
+                    MinimumWarningAppVersion                           = '1.5'
+                    MinimumWarningOSVersion                            = '1.5'
+                    MinimumWarningPatchVersion                         = '2021-07-13'
+                    IsAssigned                                         = $True
+                    CustomBrowserPackageId                             = ''
+                    CustomBrowserDisplayName                           = ''
+                    AllowedDataIngestionLocations                      = @('oneDriveForBusiness','sharePoint','camera')
+                    AppActionIfAndroidDeviceManufacturerNotAllowed     = 'block'
+                    AppActionIfAndroidDeviceModelNotAllowed            = 'block'
+                    AppActionIfAndroidSafetyNetAppsVerificationFailed  = 'block'
+                    AppActionIfAndroidSafetyNetDeviceAttestationFailed = 'block'
+                    AppActionIfDeviceComplianceRequired                = 'block'
+                    AppActionIfDeviceLockNotSet                        = 'block'
+                    AppActionIfMaximumPinRetriesExceeded               = 'block'
+                    DialerRestrictionLevel                             = 'allApps'
+                    MaximumAllowedDeviceThreatLevel                    = 'low'
+                    MobileThreatDefenseRemediationAction               = 'block'
+                    NotificationRestriction                            = 'block'
+#                    ProtectedMessagingRedirectAppType                  = 'anyApp'
+                    RequiredAndroidSafetyNetAppsVerificationType       = 'enabled'
+                    RequiredAndroidSafetyNetDeviceAttestationType      = 'basicIntegrityAndDeviceCertification'
+                    RequiredAndroidSafetyNetEvaluationType             = 'basic'
+                    TargetedAppManagementLevels                        = 'unspecified'
+ <#                   ApprovedKeyboards                                  = @(
+                                                                            [pscustomobject]@{
+                                                                                name = 'fakestring'
+                                                                                value = 'fakestring'
+                                                                             }
+                                                                          )
+                    ExemptedAppPackages                                = @(
+                                                                            [pscustomobject]@{
+                                                                                name = 'fakestring'
+                                                                                value = 'fakestring'
+                                                                             }
+                                                                          )#>
                 }
             }
 
