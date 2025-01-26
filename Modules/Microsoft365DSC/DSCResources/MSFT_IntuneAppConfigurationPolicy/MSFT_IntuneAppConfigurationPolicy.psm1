@@ -85,63 +85,68 @@ function Get-TargetResource
         $AccessTokens
     )
 
-    $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
-        -InboundParameters $PSBoundParameters
+    Write-Verbose -Message "Getting configuration of the Intune App Configuration Policy with Id {$Id} and DisplayName {$DisplayName}"
 
-    #Ensure the proper dependencies are installed in the current environment.
-    Confirm-M365DSCDependencies
-
-    #region Telemetry
-    $ResourceName = $MyInvocation.MyCommand.ModuleName -replace 'MSFT_', ''
-    $CommandName = $MyInvocation.MyCommand
-    $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
-        -CommandName $CommandName `
-        -Parameters $PSBoundParameters
-    Add-M365DSCTelemetryEvent -Data $data
-    #endregion
-
-    $nullResult = ([Hashtable]$PSBoundParameters).clone()
-    $nullResult.Ensure = 'Absent'
     try
     {
+        if (-not $Script:exportedInstance)
+        {
+            $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
+                -InboundParameters $PSBoundParameters
 
-        try
-        {
-            $configPolicy = Get-MgBetaDeviceAppManagementTargetedManagedAppConfiguration -TargetedManagedAppConfigurationId $Id -ExpandProperty 'Apps' `
-                -ErrorAction Stop
-        }
-        catch
-        {
+            #Ensure the proper dependencies are installed in the current environment.
+            Confirm-M365DSCDependencies
+
+            #region Telemetry
+            $ResourceName = $MyInvocation.MyCommand.ModuleName -replace 'MSFT_', ''
+            $CommandName = $MyInvocation.MyCommand
+            $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
+                -CommandName $CommandName `
+                -Parameters $PSBoundParameters
+            Add-M365DSCTelemetryEvent -Data $data
+            #endregion
+
+            $nullResult = ([Hashtable]$PSBoundParameters).clone()
+            $nullResult.Ensure = 'Absent'
+
             $configPolicy = $null
-        }
-
-        if ($null -eq $configPolicy)
-        {
-            Write-Verbose -Message "Could not find an Intune App Configuration Policy with Id {$Id}, searching by DisplayName {$DisplayName}"
-
-            try
+            if (-not [string]::IsNullOrEmpty($Id))
             {
-                $configPolicy = Get-MgBetaDeviceAppManagementTargetedManagedAppConfiguration -All -ExpandProperty 'Apps' -Filter "displayName eq '$DisplayName'" `
-                    -ErrorAction Stop
-            }
-            catch
-            {
-                $configPolicy = $null
+                $configPolicy = Get-MgBetaDeviceAppManagementTargetedManagedAppConfiguration -TargetedManagedAppConfigurationId $Id -ExpandProperty 'Apps' `
+                    -ErrorAction SilentlyContinue
             }
 
             if ($null -eq $configPolicy)
             {
-                Write-Verbose -Message "No App Configuration Policy with DisplayName {$DisplayName} was found"
-                return $nullResult
+                Write-Verbose -Message "Could not find an Intune App Configuration Policy with Id {$Id}, searching by DisplayName {$DisplayName}"
+
+                try
+                {
+                    $configPolicy = Get-MgBetaDeviceAppManagementTargetedManagedAppConfiguration -All -Filter "displayName eq '$DisplayName'" -ExpandProperty 'Apps' `
+                        -ErrorAction Stop
+                }
+                catch
+                {
+                    $configPolicy = $null
+                }
+
+                if ($null -eq $configPolicy)
+                {
+                    Write-Verbose -Message "No App Configuration Policy with DisplayName {$DisplayName} was found"
+                    return $nullResult
+                }
+                if (([array]$configPolicy).count -gt 1)
+                {
+                    throw "A policy with a duplicated displayName {'$DisplayName'} was found - Ensure displayName is unique"
+                }
             }
-            if (([array]$configPolicy).count -gt 1)
-            {
-                throw "A policy with a duplicated displayName {'$DisplayName'} was found - Ensure displayName is unique"
-            }
+        }
+        else
+        {
+            $configPolicy = $Script:exportedInstance
         }
 
         Write-Verbose -Message "Found App Configuration Policy with Id {$($configPolicy.Id)} and DisplayName {$($configPolicy.DisplayName)}"
-
         #get the full app details and replace what was retrieved using Get-MgBetaDeviceAppManagementTargetedManagedAppConfiguration
         if($null -ne $configPolicy.Apps)
         {
@@ -184,8 +189,6 @@ function Get-TargetResource
                 }
             }
         }
-
-
 
         $returnHashtable = @{
             Id                          = $configPolicy.Id
@@ -342,13 +345,8 @@ function Set-TargetResource
     {
         Write-Verbose -Message "Creating new Intune App Configuration Policy {$DisplayName}"
         $creationParams = @{
-            displayName                 = $DisplayName
-            description                 = $Description
-            AppGroupType                = $AppGroupType
-            RoleScopeTagIds             = $RoleScopeTagIds
-            DeployedAppCount            = $DeployedAppCount
-            IsAssigned                  = $IsAssigned
-            TargetedAppManagementLevels = $TargetedAppManagementLevels
+            displayName = $DisplayName
+            description = $Description
         }
         if ($null -ne $CustomSettings)
         {
@@ -411,19 +409,13 @@ function Set-TargetResource
             targetedManagedAppConfigurationId = $currentconfigPolicy.Id
             displayName                       = $DisplayName
             description                       = $Description
-            AppGroupType                      = $AppGroupType
-            RoleScopeTagIds                   = $RoleScopeTagIds
-            DeployedAppCount                  = $DeployedAppCount
-            IsAssigned                        = $IsAssigned
-            TargetedAppManagementLevels       = $TargetedAppManagementLevels
         }
         if ($null -ne $CustomSettings)
         {
             $customSettingsValue = ConvertTo-M365DSCIntuneAppConfigurationPolicyCustomSettings -Settings $CustomSettings
             $updateParams.Add('customSettings', $customSettingsValue)
         }
-
-
+        
         if ($null -ne $Apps)
         {
             Write-Verbose -Message "Updating 'Apps' is not supported, if Test-TargetResource still fails after PATCH, manual remediation may be required."
@@ -726,6 +718,8 @@ function Export-TargetResource
                 Managedidentity       = $ManagedIdentity.IsPresent
                 AccessTokens          = $AccessTokens
             }
+
+            $Script:exportedInstance = $configPolicy
             $Results = Get-TargetResource @params
             if (-not (Test-M365DSCAuthenticationParameter -BoundParameters $Results))
             {
@@ -792,16 +786,6 @@ function Export-TargetResource
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'CustomSettings'
             }
 
-            if ($Results.Apps)
-            {
-                $isCIMArray = $false
-                if ($Results.Apps.getType().Fullname -like '*[[\]]')
-                {
-                    $isCIMArray = $true
-                }
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'Apps' -IsCIMArray:$isCIMArray
-            }
-
             if ($Results.Assignments)
             {
                 $isCIMArray = $false
@@ -812,6 +796,15 @@ function Export-TargetResource
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'Assignments' -IsCIMArray:$isCIMArray
             }
 
+            if ($Results.Apps)
+            {
+                $isCIMArray = $false
+                if ($Results.Apps.getType().Fullname -like '*[[\]]')
+                {
+                    $isCIMArray = $true
+                }
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'Apps' -IsCIMArray:$isCIMArray
+            }
 
             $dscContent += $currentDSCBlock
             Save-M365DSCPartialExport -Content $currentDSCBlock `
@@ -896,103 +889,6 @@ function ConvertTo-M365DSCIntuneAppConfigurationPolicyCustomSettings
         $result += $currentSetting
     }
     return $result
-}
-
-function ConvertTo-M365DSCIntuneAppConfigurationPolicyApps
-{
-    [OutputType([System.Object[]])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [System.Collections.ArrayList]
-        $Settings
-    )
-    $result = @()
-    foreach ($setting in $Settings)
-    {
-        if($null -ne $setting.mobileAppIdentifier.bundleID)
-        {
-            $dataType = "#microsoft.graph.iosMobileAppIdentifier"
-            $myKey = "bundleID"
-            $myValue = $setting.mobileAppIdentifier.bundleID
-        }
-
-        if($null -ne $setting.mobileAppIdentifier.packageID)
-        {
-            $dataType = "#microsoft.graph.androidMobileAppIdentifier"
-            $myKey = "packageID"
-            $myValue = $setting.mobileAppIdentifier.packageID
-        }
-
-        if($null -ne $setting.mobileAppIdentifier.windowsAppId)
-        {
-            $dataType = "#microsoft.graph.windowsAppIdentifier"
-            $myKey = "windowsAppId"
-            $myValue = $setting.mobileAppIdentifier.windowsAppId
-        }
-
-        $currentSetting = @{
-            id  = $setting.id
-            version = $setting.version
-            mobileAppIdentifier = @{
-                '@odata.type' = $dataType
-                $myKey        = $myValue
-            }
-        }
-        $result += $currentSetting
-    }
-    return $result
-}
-
-function Get-M365DSCIntuneAppConfigurationPolicyAppsAsString
-{
-    [CmdletBinding()]
-    [OutputType([System.String])]
-    param(
-        [Parameter(Mandatory = $true)]
-        [System.Object[]]
-        $Settings
-    )
-
-    #first determine what sort of app we're dealing with
-
-
-    $StringContent = '@('
-    $space = '                '
-    $indent = '    '
-
-    $i = 1
-    foreach ($setting in $Settings)
-    {
-        if ($Settings.Count -gt 1)
-        {
-            $StringContent += "`r`n"
-            $StringContent += "$space"
-        }
-        $StringContent += "MSFT_managedMobileApp { `r`n"
-        $StringContent += "$($space)$($indent)id  = '" + $setting.Id + "'`r`n"
-        $StringContent += "$($space)$($indent)version = '" + $setting.Version + "'`r`n"
-        $StringContent += "$($space)$($indent)mobileAppIdentifier = @(`r`n"
-        foreach($key in $setting.mobileAppIdentifier.AdditionalProperties.keys)
-        {
-            if($key -ne '@odata.type')
-            {
-            $myKey = $key #should be bundleID or packageID or windowsAppId
-            } 
-        }
-
-
-        $StringContent += "$($space)$($indent)$($indent)MSFT_AppIdentifier { `r`n"
-               #$StringContent += "$($space)$($indent)$($indent)@odata.type = '" + $setting.mobileAppIdentifier.AdditionalProperties.'@odata.type' + "'`r`n"
-        $StringContent += "$($space)$($indent)$($indent)$($indent)$myKey = '" + $setting.mobileAppIdentifier.AdditionalProperties.$myKey + "'`r`n"
-        $StringContent += "$($space)$($indent)$($indent)} `r`n"
-        $StringContent += "$($space)$($indent))`r`n"
-        $StringContent += "$space}"
-
-        $i++
-    }
-
-    $StringContent += ')'
-    return $StringContent
 }
 
 Export-ModuleMember -Function *-TargetResource
