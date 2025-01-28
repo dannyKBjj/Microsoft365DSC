@@ -20,6 +20,9 @@
   * Fixes an issue with fetching a policy that does not exist.
 * IntuneAppProtectionPolicyAndroid
   * Fixes an issue with fetching a policy that does not exist.
+* IntuneAppProtectionPolicyAndroid
+  * FIXES [#5590](https://github.com/microsoft/Microsoft365DSC/issues/5590)
+
 * IntuneDeviceEnrollmentPlatformRestriction
   * Fixes an issue with fetching a policy that does not exist.
 * M365DSCReverse
