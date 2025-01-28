@@ -44,6 +44,9 @@
   * Fixes an issue with fetching a policy that does not exist.
 * IntuneDeviceEnrollmentPlatformRestriction
   * Fixes an issue with fetching a policy that does not exist.
+* IntuneMobileAppConfigurationPolicyIOS
+  * FIXES [#5587](https://github.com/microsoft/Microsoft365DSC/issues/5587)
+  * IntuneAppConfigurationDevicePolicy module has been deprecated and replaced with IntuneMobileAppConfigurationPolicyIOS and IntuneAndroidManagedStoreAppConfiguration.
 * M365DSCReverse
   * Only fetch tenant name if not in correct format.
 * O365SearchAndIntelligenceConfigurations

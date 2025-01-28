@@ -95,6 +95,9 @@ function Get-TargetResource
         $AccessTokens
     )
 
+    Write-Verbose -Message "This module has been deprecated, please use MSFT_IntuneMobileAppConfigurationPolicyIOS for iOS policy and MSFT_IntuneAndroidManagedStoreAppConfiguration for Android."
+    return @{}
+
     Write-Verbose -Message "Getting configuration of the Intune App Configuration Device Policy with Id {$Id} and DisplayName {$DisplayName}"
 
     try
@@ -359,6 +362,8 @@ function Set-TargetResource
         [System.String[]]
         $AccessTokens
     )
+    Write-Verbose -Message "This module has been deprecated, please use MSFT_IntuneMobileAppConfigurationPolicyIOS for iOS policy and MSFT_IntuneAndroidManagedStoreAppConfiguration for Android."
+    return @{}
 
     #Ensure the proper dependencies are installed in the current environment.
     Confirm-M365DSCDependencies
@@ -585,6 +590,8 @@ function Test-TargetResource
         [System.String[]]
         $AccessTokens
     )
+    Write-Verbose -Message "This module has been deprecated, please use MSFT_IntuneMobileAppConfigurationPolicyIOS for iOS policy and MSFT_IntuneAndroidManagedStoreAppConfiguration for Android."
+    return @{}
 
     #Ensure the proper dependencies are installed in the current environment.
     Confirm-M365DSCDependencies
@@ -681,6 +688,8 @@ function Export-TargetResource
         [System.String[]]
         $AccessTokens
     )
+    Write-Verbose -Message "This module has been deprecated, please use MSFT_IntuneMobileAppConfigurationPolicyIOS for iOS policy and MSFT_IntuneAndroidManagedStoreAppConfiguration for Android."
+    return @{}
 
     $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
         -InboundParameters $PSBoundParameters
