@@ -352,12 +352,6 @@ function Test-TargetResource
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
     $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
-
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        Write-Verbose -Message "Test-TargetResource returned $false"
-        return $false
-    }
     $testResult = $true
 
     #Compare Cim instances
@@ -500,9 +494,32 @@ function Export-TargetResource
 
             if ($null -ne $Results.Definition)
             {
-                $Results.Definition = Get-M365DSCAADHomeRealDiscoveryPolicyDefinitionAsString $Results.Definition
-            }
+                $complexMapping = @(
+                    @{
+                        Name            = 'Definition'
+                        CimInstanceName = 'AADHomeRealDiscoveryPolicyDefinition'
+                        IsRequired      = $False
+                    },
+                    @{
+                        Name            = 'AlternateIdLogin'
+                        CimInstanceName = 'AADHomeRealDiscoveryPolicyDefinitionAlternateIdLogin'
+                        IsRequired      = $False
+                    }
+                )
+                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
+                    -ComplexObject $Results.Definition `
+                    -CIMInstanceName 'AADHomeRealDiscoveryPolicyDefinition' `
+                    -ComplexTypeMapping $complexMapping
 
+                if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
+                {
+                    $Results.Definition = $complexTypeStringResult
+                }
+                else
+                {
+                    $Results.Remove('Definition') | Out-Null
+                }
+            }
             $currentDSCBlock = Get-M365DSCExportContentForResource -ResourceName $ResourceName `
                 -ConnectionMode $ConnectionMode `
                 -ModulePath $PSScriptRoot `

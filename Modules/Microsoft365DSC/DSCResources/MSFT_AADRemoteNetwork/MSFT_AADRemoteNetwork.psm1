@@ -364,12 +364,6 @@ function Test-TargetResource
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
     $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
-
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        Write-Verbose -Message "Test-TargetResource returned $false"
-        return $false
-    }
     $testResult = $true
 
     #Compare Cim instances
@@ -486,6 +480,10 @@ function Export-TargetResource
         }
         foreach ($config in $getValue)
         {
+            if ($null -ne $Global:M365DSCExportResourceInstancesCount)
+            {
+                $Global:M365DSCExportResourceInstancesCount++
+            }
             $displayedKey = $config.Id
             if (-not [String]::IsNullOrEmpty($config.Name))
             {
@@ -513,9 +511,43 @@ function Export-TargetResource
             $Results = Update-M365DSCExportAuthenticationResults -ConnectionMode $ConnectionMode `
                 -Results $Results
 
-            if ($null -ne $Results.DeviceLinks -and $Results.DeviceLinks.Count -gt 0)
+            if ($null -ne $Results.DeviceLinks)
             {
-                $Results.DeviceLinks = Get-MicrosoftGraphRemoteNetworkDeviceLinksHashtableAsString -DeviceLinks $Results.DeviceLinks
+                $complexMapping = @(
+                    @{
+                        Name            = 'DeviceLinks'
+                        CimInstanceName = 'AADRemoteNetworkDeviceLink'
+                        IsRequired      = $False
+                    },
+                    @{
+                        Name            = 'BgpConfiguration'
+                        CimInstanceName = 'AADRemoteNetworkDeviceLinkbgpConfiguration'
+                        IsRequired      = $False
+                    },
+                    @{
+                        Name            = 'RedundancyConfiguration'
+                        CimInstanceName = 'AADRemoteNetworkDeviceLinkRedundancyConfiguration'
+                        IsRequired      = $False
+                    },
+                    @{
+                        Name            = 'TunnelConfiguration'
+                        CimInstanceName = 'AADRemoteNetworkDeviceLinkTunnelConfiguration'
+                        IsRequired      = $False
+                    }
+                )
+                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
+                    -ComplexObject $Results.DeviceLinks `
+                    -CIMInstanceName 'AADRemoteNetworkDeviceLink' `
+                    -ComplexTypeMapping $complexMapping
+
+                if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
+                {
+                    $Results.DeviceLinks = $complexTypeStringResult
+                }
+                else
+                {
+                    $Results.Remove('DeviceLinks') | Out-Null
+                }
             }
 
             $currentDSCBlock = Get-M365DSCExportContentForResource -ResourceName $ResourceName `
@@ -526,7 +558,7 @@ function Export-TargetResource
 
             if ($Results.DeviceLinks)
             {
-                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'DeviceLinks'
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'DeviceLinks' -IsCIMArray:$true
             }
 
             $dscContent += $currentDSCBlock

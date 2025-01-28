@@ -60,7 +60,7 @@ function Get-TargetResource
 
     Write-Verbose -Message "Getting configuration of the Intune Account Protection Local User Group Membership Policy with Id {$Identity} and DisplayName {$DisplayName}"
 
-    try 
+    try
     {
         if (-not $Script:exportedInstance)
         {
@@ -89,7 +89,7 @@ function Get-TargetResource
             {
                 $policy = Get-MgBetaDeviceManagementConfigurationPolicy -DeviceManagementConfigurationPolicyId $Identity -ExpandProperty settings -ErrorAction SilentlyContinue
             }
-            
+
             if ($null -eq $policy)
             {
                 Write-Verbose -Message "No Account Protection Local User Group Membership Policy with identity {$Identity} was found"
@@ -108,13 +108,13 @@ function Get-TargetResource
                         return $nullResult
                     }
 
-                    $policy = Get-MgBetaDeviceManagementConfigurationPolicy -DeviceManagementConfigurationPolicyId $policy.id -ExpandProperty settings -ErrorAction SilentlyContinue
+                    $policy = Get-MgBetaDeviceManagementConfigurationPolicy -DeviceManagementConfigurationPolicyId $policy.Id -ExpandProperty settings -ErrorAction SilentlyContinue
                 }
             }
         }
         else
         {
-            $policy = $Script:exportedInstance
+            $policy = Get-MgBetaDeviceManagementConfigurationPolicy -DeviceManagementConfigurationPolicyId $Script:exportedInstance.Id -ExpandProperty settings
         }
 
 
@@ -429,13 +429,7 @@ function Test-TargetResource
     Write-Verbose -Message "Testing configuration of Account Protection Local User Group Membership Policy {$DisplayName}"
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
-    $ValuesToCheck = ([Hashtable]$PSBoundParameters).Clone()
-
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        Write-Verbose -Message "Test-TargetResource returned $false"
-        return $false
-    }
+    $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
     $testResult = $true
 
     Write-Verbose -Message "Current Values: $(Convert-M365DscHashtableToString -Hashtable $CurrentValues)"

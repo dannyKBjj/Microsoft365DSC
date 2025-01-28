@@ -1,16 +1,63 @@
 # Change log for Microsoft365DSC
 
-# UNRELEASED
-* IntuneDeviceCompliancePolicyAndroidDeviceOwner
-  * Added missing properties for androidForWorkCompliancePolicy resource type: https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfig-androiddeviceownercompliancepolicy?view=graph-rest-beta.
-  * Non-compliance actions now supported for Export- Test- Get-
-  * Non-compliance actions now supported for Set- when creating a policy, but not when updating a policy. Update can't be supported due to MgGraph bug.
-    FIXES [#5593](https://github.com/microsoft/Microsoft365DSC/issues/5593)
-* IntuneDeviceCompliancePolicyAndroidWorkProfile
-  * Added missing properties for androidForWorkCompliancePolicy resource type: https://learn.microsoft.com/en-us/graph/api/resources/intune-deviceconfig-androidforworkcompliancepolicy?view=graph-rest-beta.
-  * Non-compliance actions now supported for Export- Test- Get-
-  * Non-compliance actions now supported for Set- when creating a policy, but not when updating a policy. Update can't be supported due to MgGraph bug.
-    FIXES [#5592](https://github.com/microsoft/Microsoft365DSC/issues/5592)
+# 1.25.122.2
+
+* AADAdminConsentRequestPolicy
+  * Refactored the export to use a common CIMInstance function.
+* AADCrossTenantAccessPolicyConfigurationDefault
+  * Refactored the export to use a common CIMInstance function.
+* AADCrossTenantAccessPolicyConfigurationPartner
+  * Refactored the export to use a common CIMInstance function.
+* AADGroup
+  * Refactored the export to use a common CIMInstance function.
+  * Added functionality to add & check on Devices in AAD groups.
+* AADHomeRealmDiscoveryPolicy
+  * Refactored the export to use a common CIMInstance function.
+* AADIdentityGovernanceLifecycleWorkflow
+  * Refactored the export to use a common CIMInstance function.
+* AADNetworkAccessForwardingPolicy
+  * Refactored the export to use a common CIMInstance function.
+* AADNetworkAccessForwardingProfile
+  * Refactored the export to use a common CIMInstance function.
+* AADRemoteNetwork
+  * Refactored the export to use a common CIMInstance function.
+* AADRoleAssignmentScheduleRequest
+  * Refactored the export to use a common CIMInstance function.
+* AADRoleEligibilityScheduleRequest
+  * Fixed overall logic to prevent errors complaining about existing permissions.
+  * Refactored the export to use a common CIMInstance function.
+* FabricAdminTenantSettings
+  * Fix titles that have a zero length whitespace character.
+* IntuneAppProtectionPolicyAndroid
+  * Fixes an error retrieving the group id for assignment which resulted
+    in a 500 error when creating or updating an instance.
+* IntuneAccountProtectionLocalUserGroupMembershipPolicy
+  * Fixes an issue where not all details were exported.
+* IntuneAccountProtectionPolicy
+  * Fixes an issue where not all details were exported.
+* IntuneAppConfigurationPolicy
+  * Fixes an issue with fetching a policy that does not exist.
+    FIXES [#5666](https://github.com/microsoft/Microsoft365DSC/issues/5666)
+* IntuneApplicationControlPolicyWindows10
+  * Fixes an issue with fetching a policy that does not exist.
+* IntuneAppProtectionPolicyAndroid
+  * Fixes an issue with fetching a policy that does not exist.
+* IntuneDeviceEnrollmentPlatformRestriction
+  * Fixes an issue with fetching a policy that does not exist.
+* M365DSCReverse
+  * Only fetch tenant name if not in correct format.
+* O365SearchAndIntelligenceConfigurations
+  * Added support for Meeting Insights settings.
+  * Added support for Service Principal authentication.
+* SCInsiderRiskEntityList
+  * Fixed trailing whitespaces in the name of some properties when attempting
+    to set values.
+* TeamsEmergencyCallRoutingPolicy
+  * Refactored the export to use a common CIMInstance function.
+* TeamsTenantDialPlan
+  * Refactored the export to use a common CIMInstance function.
+
+# 1.25.122.1
 
 * AADConditionalAccessPolicy
   * Fixes CA policy deployment errors when deploying policies based for workload identities.
@@ -67,6 +114,8 @@
 * M365DSCReport
   * Fix missing delimiter when called without the parameter.
     FIXES [#5634](https://github.com/microsoft/Microsoft365DSC/issues/5634)
+  * Add configuration validation to inform about comparisons against empty or invalid configurations.
+    FIXES [#5658](https://github.com/microsoft/Microsoft365DSC/issues/5658)
 * M365DSCTelemetryEngine
   * Report LCM details only if running as administrator.
 * M365DSCUtil
@@ -74,6 +123,11 @@
     making the comparison otherwise it may fail as it did for a few resources
     FIXES [#5648](https://github.com/microsoft/Microsoft365DSC/issues/5648)
 * MISC
+  * Modified 100+ Test-TargetResource logic to prevent returning $false when
+    the Ensure parameter doesn't match the desired value. While this could introduce
+    a very small performance gain in some cases, it resulted in a lot of drifts being
+    detected without proper logging. All evaluation, including of the Ensure property,
+    is now being handled by the Test-M365DSCParameterState function.
   * Export Performance Improvements
     Implements the changes described in [#5615](https://github.com/microsoft/Microsoft365DSC/issues/5615)
     Improved resource caching behavior across Intune resources.
@@ -151,6 +205,8 @@
 * IntuneTrustedRootCertificateAndroidWork
   * Initial Release
 * MISC
+  * DEFENDER
+    * Added support for the UseBasicParsing paramter for REST calls.
   * Added check to `New-M365DSCReportFromConfiguration` to make sure Windows
     Remoting is enabled, which is required to convert the DSC config.
   * Defender

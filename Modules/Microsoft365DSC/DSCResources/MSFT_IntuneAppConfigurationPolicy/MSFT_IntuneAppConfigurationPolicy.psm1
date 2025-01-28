@@ -86,7 +86,7 @@ function Get-TargetResource
             if (-not [string]::IsNullOrEmpty($Id))
             {
                 $configPolicy = Get-MgBetaDeviceAppManagementTargetedManagedAppConfiguration -TargetedManagedAppConfigurationId $Id `
-                    -ErrorAction Stop
+                    -ErrorAction SilentlyContinue
             }
 
             if ($null -eq $configPolicy)
@@ -376,12 +376,6 @@ function Test-TargetResource
 
     Write-Verbose -Message "Current Values: $(Convert-M365DscHashtableToString -Hashtable $CurrentValues)"
     Write-Verbose -Message "Target Values: $(Convert-M365DscHashtableToString -Hashtable $PSBoundParameters)"
-
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        Write-Verbose -Message "Test-TargetResource returned $false"
-        return $false
-    }
     $testResult = $true
 
     #Compare Cim instances

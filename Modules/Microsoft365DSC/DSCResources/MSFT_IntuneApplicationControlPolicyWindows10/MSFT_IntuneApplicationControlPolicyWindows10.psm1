@@ -91,7 +91,7 @@ function Get-TargetResource
             #Retrieve policy general settings
             if (-not [System.String]::IsNullOrEmpty($Id))
             {
-                $policy = Get-MgBetaDeviceManagementIntent -DeviceManagementIntentId $Id -ErrorAction Stop
+                $policy = Get-MgBetaDeviceManagementIntent -DeviceManagementIntentId $Id -ErrorAction SilentlyContinue
             }
 
             if ($null -eq $policy)
@@ -407,13 +407,8 @@ function Test-TargetResource
 
     Write-Verbose -Message "Current Values: $(Convert-M365DscHashtableToString -Hashtable $CurrentValues)"
     Write-Verbose -Message "Target Values: $(Convert-M365DscHashtableToString -Hashtable $PSBoundParameters)"
-    $ValuesToCheck = ([hashtable]$PSBoundParameters).clone()
-
+    $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
     $testResult = $true
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        $testResult = $false
-    }
     #region Assignments
     if ($TestResult)
     {

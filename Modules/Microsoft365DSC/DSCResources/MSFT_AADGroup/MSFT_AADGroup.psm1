@@ -201,32 +201,36 @@ function Get-TargetResource
             }
         }
 
-            $MembersValues = $null
-            $result = @{}
-            if ($Group.MembershipRuleProcessingState -ne 'On')
+        $MembersValues = $null
+        $result = @{}
+        if ($Group.MembershipRuleProcessingState -ne 'On')
+        {
+            # Members
+            [Array]$members = Get-MgBetaGroupMember -GroupId $Group.Id -All:$true
+            $MembersValues = @()
+            $GroupAsMembersValues = @()
+            foreach ($member in $members)
             {
-                # Members
-                [Array]$members = Get-MgBetaGroupMember -GroupId $Group.Id -All:$true
-                $MembersValues = @()
-                $GroupAsMembersValues = @()
-                foreach ($member in $members)
+                if ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.user')
                 {
-                    if ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.user')
-                    {
-                        $MembersValues += $member.AdditionalProperties.userPrincipalName
-                    }
-                    elseif ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.servicePrincipal')
-                    {
-                        $MembersValues += $member.AdditionalProperties.displayName
-                    }
-                    elseif ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.group')
-                    {
-                        $GroupAsMembersValues += $member.AdditionalProperties.displayName
-                    }
+                    $MembersValues += $member.AdditionalProperties.userPrincipalName
                 }
-                $result.Add('Members', $MembersValues)
-                $result.Add('GroupAsMembers', $GroupAsMembersValues)
+                elseif ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.servicePrincipal')
+                {
+                    $MembersValues += $member.AdditionalProperties.displayName
+                }
+                elseif ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.device')
+                {
+                    $MembersValues += $member.AdditionalProperties.displayName
+                }
+                elseif ($member.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.group')
+                {
+                    $GroupAsMembersValues += $member.AdditionalProperties.displayName
+                }
             }
+            $result.Add('Members', $MembersValues)
+            $result.Add('GroupAsMembers', $GroupAsMembersValues)
+        }
 
         # MemberOf
         [Array]$memberOf = Get-MgBetaGroupMemberOf -GroupId $Group.Id -All # result also used for/by AssignedToRole
@@ -732,6 +736,12 @@ function Set-TargetResource
                     {
                         $directoryObject = Get-MgServicePrincipal -Filter "AppId eq '$($app.AppId)'"
                     }
+                }
+
+                if ($null -eq $directoryObject)
+                {
+                    Write-Verbose -Message "Trying to retrieve Device {$($diff.InputObject)}"
+                    $directoryObject = Get-MgBetaDevice -Filter "DisplayName eq '$($diff.InputObject)'"
                 }
 
                 if ($diff.SideIndicator -eq '=>')
@@ -1308,9 +1318,29 @@ function Export-TargetResource
             $Results = Get-TargetResource @Params
             $Results = Update-M365DSCExportAuthenticationResults -ConnectionMode $ConnectionMode `
                 -Results $Results
-            if ($results.AssignedLicenses.Length -gt 0)
+
+            if ($null -ne $Results.AssignedLicenses)
             {
-                $Results.AssignedLicenses = Get-M365DSCAzureADGroupLicensesAsString $Results.AssignedLicenses
+                $complexMapping = @(
+                    @{
+                        Name            = 'AssignedLicenses'
+                        CimInstanceName = 'AADGroupLicense'
+                        IsRequired      = $False
+                    }
+                )
+                $complexTypeStringResult = Get-M365DSCDRGComplexTypeToString `
+                    -ComplexObject $Results.AssignedLicenses `
+                    -CIMInstanceName 'AADGroupLicense' `
+                    -ComplexTypeMapping $complexMapping
+
+                if (-Not [String]::IsNullOrWhiteSpace($complexTypeStringResult))
+                {
+                    $Results.AssignedLicenses = $complexTypeStringResult
+                }
+                else
+                {
+                    $Results.Remove('AssignedLicenses') | Out-Null
+                }
             }
             $currentDSCBlock = Get-M365DSCExportContentForResource -ResourceName $ResourceName `
                 -ConnectionMode $ConnectionMode `
