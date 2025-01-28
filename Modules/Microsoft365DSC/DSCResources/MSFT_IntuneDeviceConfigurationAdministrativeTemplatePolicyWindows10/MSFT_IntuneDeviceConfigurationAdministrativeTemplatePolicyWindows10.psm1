@@ -65,52 +65,64 @@ function Get-TargetResource
         $AccessTokens
     )
 
+    Write-Verbose -Message "Getting configuration of the Intune Device Configuration Administrative Template Policy for Windows10 with Id {$Id} and DisplayName {$DisplayName}"
+
     try
     {
-        $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
-            -InboundParameters $PSBoundParameters
-
-        #Ensure the proper dependencies are installed in the current environment.
-        Confirm-M365DSCDependencies
-
-        #region Telemetry
-        $ResourceName = $MyInvocation.MyCommand.ModuleName.Replace('MSFT_', '')
-        $CommandName = $MyInvocation.MyCommand
-        $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
-            -CommandName $CommandName `
-            -Parameters $PSBoundParameters
-        Add-M365DSCTelemetryEvent -Data $data
-        #endregion
-
-        $nullResult = $PSBoundParameters
-        $nullResult.Ensure = 'Absent'
-
-        $getValue = $null
-        #region resource generator code
-        $getValue = Get-MgBetaDeviceManagementGroupPolicyConfiguration -GroupPolicyConfigurationId $Id -ErrorAction SilentlyContinue
-
-        if ($null -eq $getValue)
+        if (-not $Script:exportedInstance)
         {
-            Write-Verbose -Message "Could not find an Intune Device Configuration Administrative Template Policy for Windows10 with Id {$Id}"
+            $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
+                -InboundParameters $PSBoundParameters
 
-            if (-Not [string]::IsNullOrEmpty($DisplayName))
+            #Ensure the proper dependencies are installed in the current environment.
+            Confirm-M365DSCDependencies
+
+            #region Telemetry
+            $ResourceName = $MyInvocation.MyCommand.ModuleName.Replace('MSFT_', '')
+            $CommandName = $MyInvocation.MyCommand
+            $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
+                -CommandName $CommandName `
+                -Parameters $PSBoundParameters
+            Add-M365DSCTelemetryEvent -Data $data
+            #endregion
+
+            $nullResult = $PSBoundParameters
+            $nullResult.Ensure = 'Absent'
+
+            $getValue = $null
+            #region resource generator code
+            if (-not [System.String]::IsNullOrEmpty($Id))
             {
-                $getValue = Get-MgBetaDeviceManagementGroupPolicyConfiguration `
-                    -All `
-                    -Filter "DisplayName eq '$DisplayName'" `
-                    -ErrorAction SilentlyContinue
-                if ($null -eq $getValue)
+                $getValue = Get-MgBetaDeviceManagementGroupPolicyConfiguration -GroupPolicyConfigurationId $Id -ErrorAction SilentlyContinue
+            }
+
+            if ($null -eq $getValue)
+            {
+                Write-Verbose -Message "Could not find an Intune Device Configuration Administrative Template Policy for Windows10 with Id {$Id}"
+
+                if (-Not [string]::IsNullOrEmpty($DisplayName))
                 {
-                    Write-Verbose -Message "Could not find an Intune Device Configuration Administrative Template Policy for Windows10 with DisplayName {$DisplayName}"
-                    return $nullResult
-                }
-                if (([array]$getValue).count -gt 1)
-                {
-                    throw "A policy with a duplicated displayName {'$DisplayName'} was found - Ensure displayName is unique"
+                    $getValue = Get-MgBetaDeviceManagementGroupPolicyConfiguration `
+                        -All `
+                        -Filter "DisplayName eq '$DisplayName'" `
+                        -ErrorAction SilentlyContinue
+                    if ($null -eq $getValue)
+                    {
+                        Write-Verbose -Message "Could not find an Intune Device Configuration Administrative Template Policy for Windows10 with DisplayName {$DisplayName}"
+                        return $nullResult
+                    }
+                    if (([array]$getValue).count -gt 1)
+                    {
+                        throw "A policy with a duplicated displayName {'$DisplayName'} was found - Ensure displayName is unique"
+                    }
                 }
             }
+            #endregion
         }
-        #endregion
+        else
+        {
+            $getValue = $Script:exportedInstance
+        }
 
         $Id = $getValue.Id
         Write-Verbose -Message "An Intune Device Configuration Administrative Template Policy for Windows10 with Id {$Id} and DisplayName {$DisplayName} was found."
@@ -681,12 +693,6 @@ function Test-TargetResource
     }
 
     $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
-
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        Write-Verbose -Message "Test-TargetResource returned $false"
-        return $false
-    }
     $testResult = $true
 
     #Compare Cim instances
@@ -700,26 +706,27 @@ function Test-TargetResource
             if ($key -eq 'DefinitionValues')
             {
                 $source = Get-M365DSCDRGComplexTypeToHashtable -ComplexObject $source
+                $target = Get-M365DSCDRGComplexTypeToHashtable -ComplexObject $target
                 foreach ($definitionValue in $source)
                 {
-                    $definitionValue.remove('Definition')
-                    $definitionValue.remove('Id')
+                    $definitionValue.remove('Definition') | Out-Null
+                    $definitionValue.remove('Id') | Out-Null
                     #Removing Key presentationDefinitionLabel because it is Read-Only and ID as random
                     foreach ($presentationValue in $definitionValue.PresentationValues)
                     {
-                        $presentationValue.remove('presentationDefinitionLabel')
-                        $presentationValue.remove('Id')
+                        $presentationValue.remove('presentationDefinitionLabel') | Out-Null
+                        $presentationValue.remove('Id') | Out-Null
                     }
                 }
                 foreach ($definitionValue in $target)
                 {
-                    $definitionValue.remove('Definition')
-                    $definitionValue.remove('Id')
+                    $definitionValue.remove('Definition') | Out-Null
+                    $definitionValue.remove('Id') | Out-Null
                     #Removing Key presentationDefinitionLabel because it is Read-Only and ID as random
                     foreach ($presentationValue in $definitionValue.PresentationValues)
                     {
-                        $presentationValue.remove('presentationDefinitionLabel')
-                        $presentationValue.remove('Id')
+                        $presentationValue.remove('presentationDefinitionLabel') | Out-Null
+                        $presentationValue.remove('Id') | Out-Null
                     }
                 }
             }
@@ -854,6 +861,7 @@ function Export-TargetResource
                 AccessTokens          = $AccessTokens
             }
 
+            $Script:exportedInstance = $config
             $Results = Get-TargetResource @params
             if (-not (Test-M365DSCAuthenticationParameter -BoundParameters $Results))
             {

@@ -165,39 +165,48 @@ function Get-TargetResource
         $AccessTokens
     )
 
-    Write-Verbose -Message "Checking for the Intune Android Device Compliance Policy {$DisplayName}"
-    $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
-        -InboundParameters $PSBoundParameters
+    Write-Verbose -Message "Getting configuration of the Intune Android Device Compliance Policy {$DisplayName}"
 
-    #Ensure the proper dependencies are installed in the current environment.
-    Confirm-M365DSCDependencies
-
-    #region Telemetry
-    $ResourceName = $MyInvocation.MyCommand.ModuleName -replace 'MSFT_', ''
-    $CommandName = $MyInvocation.MyCommand
-    $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
-        -CommandName $CommandName `
-        -Parameters $PSBoundParameters
-    Add-M365DSCTelemetryEvent -Data $data
-    #endregion
-
-    $nullResult = $PSBoundParameters
-    $nullResult.Ensure = 'Absent'
     try
     {
-        $devicePolicy = Get-MgBetaDeviceManagementDeviceCompliancePolicy -All `
-            -ErrorAction SilentlyContinue | Where-Object `
-            -FilterScript { $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.androidCompliancePolicy' -and `
-                $_.displayName -eq $($DisplayName) }
+        if (-not $Script:exportedInstance)
+        {
+            $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
+                -InboundParameters $PSBoundParameters
 
-        if (([array]$devicePolicy).count -gt 1)
-        {
-            throw "A policy with a duplicated displayName {'$DisplayName'} was found - Ensure displayName is unique"
+            #Ensure the proper dependencies are installed in the current environment.
+            Confirm-M365DSCDependencies
+
+            #region Telemetry
+            $ResourceName = $MyInvocation.MyCommand.ModuleName -replace 'MSFT_', ''
+            $CommandName = $MyInvocation.MyCommand
+            $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
+                -CommandName $CommandName `
+                -Parameters $PSBoundParameters
+            Add-M365DSCTelemetryEvent -Data $data
+            #endregion
+
+            $nullResult = $PSBoundParameters
+            $nullResult.Ensure = 'Absent'
+
+            $devicePolicy = Get-MgBetaDeviceManagementDeviceCompliancePolicy -All `
+                -ErrorAction SilentlyContinue | Where-Object `
+                -FilterScript { $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.androidCompliancePolicy' -and `
+                    $_.displayName -eq $($DisplayName) }
+
+            if (([array]$devicePolicy).count -gt 1)
+            {
+                throw "A policy with a duplicated displayName {'$DisplayName'} was found - Ensure displayName is unique"
+            }
+            if ($null -eq $devicePolicy)
+            {
+                Write-Verbose -Message "No Android Device Compliance Policy with displayName {$DisplayName} was found"
+                return $nullResult
+            }
         }
-        if ($null -eq $devicePolicy)
+        else
         {
-            Write-Verbose -Message "No Android Device Compliance Policy with displayName {$DisplayName} was found"
-            return $nullResult
+            $devicePolicy = $Script:exportedInstance
         }
 
         Write-Verbose -Message "Found Android Device Compliance Policy with displayName {$DisplayName}"
@@ -722,12 +731,8 @@ function Test-TargetResource
     Write-Verbose -Message "Target Values: $(Convert-M365DscHashtableToString -Hashtable $PSBoundParameters)"
 
     $ValuesToCheck = $PSBoundParameters
-
     $testResult = $true
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        $testResult = $false
-    }
+
     #region Assignments
     if ($testResult)
     {
@@ -845,6 +850,8 @@ function Export-TargetResource
                 Managedidentity       = $ManagedIdentity.IsPresent
                 AccessTokens          = $AccessTokens
             }
+
+            $Script:exportedInstance = $configDeviceAndroidPolicy
             $Results = Get-TargetResource @params
             if (-not (Test-M365DSCAuthenticationParameter -BoundParameters $Results))
             {

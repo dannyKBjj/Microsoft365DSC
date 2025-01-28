@@ -65,53 +65,55 @@ function Get-TargetResource
 
     )
 
+    Write-Verbose -Message "Getting configuration of the Intune Trusted Root Certificate Policy for Android with Id {$Id} and DisplayName {$DisplayName}"
+
     try
     {
-        $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
-            -InboundParameters $PSBoundParameters
-    }
-    catch
-    {
-        Write-Verbose -Message 'Connection to the workload failed.'
-    }
-
-    #Ensure the proper dependencies are installed in the current environment.
-    Confirm-M365DSCDependencies
-
-    #region Telemetry
-    $ResourceName = $MyInvocation.MyCommand.ModuleName.Replace('MSFT_', '')
-    $CommandName = $MyInvocation.MyCommand
-    $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
-        -CommandName $CommandName `
-        -Parameters $PSBoundParameters
-    Add-M365DSCTelemetryEvent -Data $data
-    #endregion   
-
-    $nullResult = $PSBoundParameters
-    $nullResult.Ensure = 'Absent'
-    try
-    {
-        if (-not [string]::IsNullOrWhiteSpace($id))
-        { 
-            $getValue = Get-MgBetaDeviceManagementDeviceConfiguration -DeviceConfigurationId $id -ErrorAction SilentlyContinue
-        }
-        
-        #region resource generator code
-        if ($null -eq $getValue)
+        if (-not $Script:exportedInstance)
         {
-            $getValue = Get-MgBetaDeviceManagementDeviceConfiguration -All -Filter "DisplayName eq '$Displayname'" -ErrorAction SilentlyContinue | Where-Object `
-            -FilterScript { `
-                $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.androidTrustedRootCertificate' `
+            $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
+                -InboundParameters $PSBoundParameters
+
+            #Ensure the proper dependencies are installed in the current environment.
+            Confirm-M365DSCDependencies
+
+            #region Telemetry
+            $ResourceName = $MyInvocation.MyCommand.ModuleName.Replace('MSFT_', '')
+            $CommandName = $MyInvocation.MyCommand
+            $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
+                -CommandName $CommandName `
+                -Parameters $PSBoundParameters
+            Add-M365DSCTelemetryEvent -Data $data
+            #endregion
+
+            $nullResult = $PSBoundParameters
+            $nullResult.Ensure = 'Absent'
+
+            if (-not [string]::IsNullOrWhiteSpace($id))
+            {
+                $getValue = Get-MgBetaDeviceManagementDeviceConfiguration -DeviceConfigurationId $id -ErrorAction SilentlyContinue
+            }
+
+            #region resource generator code
+            if ($null -eq $getValue)
+            {
+                $getValue = Get-MgBetaDeviceManagementDeviceConfiguration -All -Filter "DisplayName eq '$Displayname'" -ErrorAction SilentlyContinue | Where-Object `
+                -FilterScript { `
+                    $_.AdditionalProperties.'@odata.type' -eq '#microsoft.graph.androidTrustedRootCertificate' `
+                }
+            }
+            #endregion
+
+            if ($null -eq $getValue)
+            {
+                Write-Verbose -Message "No Intune Trusted Root Certificate Policy for Android with Id {$id} was found"
+                return $nullResult
             }
         }
-        #endregion
-
-        if ($null -eq $getValue)
+        else
         {
-            Write-Verbose -Message "No Intune Trusted Root Certificate Policy for Android with Id {$id} was found"
-            return $nullResult
+            $getValue = $Script:exportedInstance
         }
-
         $Id = $getValue.Id
 
         Write-Verbose -Message "An Intune Trusted Root Certificate Policy for Android with id {$id} and DisplayName {$DisplayName} was found"
@@ -120,9 +122,9 @@ function Get-TargetResource
             #region resource generator code
             Id                             = $getValue.Id
             Description                    = $getValue.Description
-            DisplayName                    = $getValue.DisplayName       
+            DisplayName                    = $getValue.DisplayName
             certFileName                   = $getValue.AdditionalProperties.certFileName
-            trustedRootCertificate         = $getValue.AdditionalProperties.trustedRootCertificate 
+            trustedRootCertificate         = $getValue.AdditionalProperties.trustedRootCertificate
             Ensure                         = 'Present'
             Credential                     = $Credential
             ApplicationId                  = $ApplicationId
@@ -133,7 +135,7 @@ function Get-TargetResource
             AccessTokens                   = $AccessTokens
             version                        = $getValue.AdditionalProperties.version
         }
-                                          
+
         $assignmentsValues = Get-MgBetaDeviceManagementDeviceConfigurationAssignment -DeviceConfigurationId $Results.Id
         $assignmentResult = @()
         if ($assignmentsValues.Count -gt 0)
@@ -282,7 +284,7 @@ function Set-TargetResource
         }
 
         $CreateParameters.add('AdditionalProperties', $AdditionalProperties)
-           
+
         #region resource generator code
         $policy = New-MgBetaDeviceManagementDeviceConfiguration @CreateParameters
         $assignmentsHash = ConvertTo-IntunePolicyAssignment -IncludeDeviceFilter:$true -Assignments $Assignments
@@ -429,12 +431,6 @@ function Test-TargetResource
 
     $CurrentValues = Get-TargetResource @PSBoundParameters
     $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
-
-    if ($CurrentValues.Ensure -ne $Ensure)
-    {
-        Write-Verbose -Message "Test-TargetResource returned $false"
-        return $false
-    }
     $testResult = $true
 
     #Compare Cim instances
@@ -579,6 +575,7 @@ function Export-TargetResource
                 AccessTokens          = $AccessTokens
             }
 
+            $Script:exportedInstance = $config
             $Results = Get-TargetResource @Params
             $Results = Update-M365DSCExportAuthenticationResults -ConnectionMode $ConnectionMode `
                 -Results $Results
@@ -618,7 +615,7 @@ function Export-TargetResource
             $i++
             Write-Host $Global:M365DSCEmojiGreenCheckMark
         }
-        
+
         return $dscContent
     }
     catch

@@ -662,6 +662,19 @@ function Test-M365DSCParameterState
     if ($null -ne $IncludedDrifts -and $IncludedDrifts.Keys.Count -gt 0)
     {
         $DriftedParameters = $IncludedDrifts
+        foreach ($existingDrift in $IncludedDrifts)
+        {
+            $propertyName = $existingDrift.Keys[0]
+            $value =  $existingDrift."$propertyName"
+            $start = $value.IndexOf('</CurrentValue>')
+            $currentValue = $value.Substring(0, $start).Replace('<CurrentValue>', '')            
+            $desiredValue = $value.Substring($start+15, ($value.Length)-($start+15)).Replace('<DesiredValue>', '').Replace('</DesiredValue>', '')
+            $DriftObject.DriftInfo.Add($propertyName, @{
+                PropertyName = $propertyName
+                CurrentValue = $currentValue
+                DesiredValue = $desiredValue
+            })
+        }
         $returnValue = $false
     }
 
@@ -839,16 +852,36 @@ function Test-M365DSCParameterState
                         {
                             'String'
                             {
-                                if ([string]::IsNullOrEmpty($CurrentValues.$fieldName) `
-                                        -and [string]::IsNullOrEmpty($DesiredValues.$fieldName))
+                                if (-not [string]::IsNullOrEmpty($CurrentValues.$fieldName))
+                                {
+                                    try
+                                    {
+                                        $CurrentValues.$fieldName = $CurrentValues.$fieldName.Replace("`r`n", "`n")
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+                                if (-not [string]::IsNullOrEmpty($DesiredValues.$fieldName))
+                                {
+                                    try
+                                    {
+                                        $DesiredValues.$fieldName = $DesiredValues.$fieldName.Replace("`r`n", "`n")
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+
+                                if ([string]::IsNullOrEmpty($CurrentValues.$fieldName) -and
+                                    [string]::IsNullOrEmpty($DesiredValues.$fieldName))
                                 {
                                 }
                                 # Align line breaks
-                                elseif (-not [string]::IsNullOrEmpty($CurrentValues.$fieldName) `
-                                        -and -not [string]::IsNullOrEmpty($DesiredValues.$fieldName) `
-                                        -and [string]::Equals($CurrentValues.$fieldName.Replace("`r`n", "`n"), `
-                                        $DesiredValues.$fieldName.Replace("`r`n", "`n"), `
-                                        [System.StringComparison]::Ordinal))
+                                elseif (-not [string]::IsNullOrEmpty($CurrentValues.$fieldName) -and
+                                    -not [string]::IsNullOrEmpty($DesiredValues.$fieldName) -and
+                                    [string]::Equals($CurrentValues.$fieldName, $DesiredValues.$fieldName,
+                                    [System.StringComparison]::Ordinal))
                                 {
                                 }
                                 else

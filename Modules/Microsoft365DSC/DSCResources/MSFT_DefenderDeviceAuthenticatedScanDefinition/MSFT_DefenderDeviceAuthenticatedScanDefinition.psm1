@@ -146,8 +146,8 @@ function Get-TargetResource
         else
         {
             $ScanAuthenticationParamsValue = @{
-                '@odata.context' = '#microsoft.windowsDefenderATP.api.SnmpAuthParams'
-                Type             = 'NoAuthNoPriv'
+                DataType = '#microsoft.windowsDefenderATP.api.SnmpAuthParams'
+                Type     = 'NoAuthNoPriv'
             }
         }
 
@@ -439,7 +439,6 @@ function Test-TargetResource
 
     Write-Verbose -Message "Current Values: $(Convert-M365DscHashtableToString -Hashtable $CurrentValues)"
     Write-Verbose -Message "Target Values: $(Convert-M365DscHashtableToString -Hashtable $ValuesToCheck)"
-
     $testResult = $true
 
     # Once set, these cannot be retrieved nor changed.

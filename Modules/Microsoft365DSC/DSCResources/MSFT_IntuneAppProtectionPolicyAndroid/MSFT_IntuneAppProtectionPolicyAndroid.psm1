@@ -215,60 +215,71 @@ function Get-TargetResource
         [System.String[]]
         $AccessTokens
     )
-    Write-Verbose -Message "Checking for the Intune Android App Protection Policy {$DisplayName}"
-    $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
-        -InboundParameters $PSBoundParameters
 
-    #Ensure the proper dependencies are installed in the current environment.
-    Confirm-M365DSCDependencies
-
-    #region Telemetry
-    $ResourceName = $MyInvocation.MyCommand.ModuleName -replace 'MSFT_', ''
-    $CommandName = $MyInvocation.MyCommand
-    $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
-        -CommandName $CommandName `
-        -Parameters $PSBoundParameters
-    Add-M365DSCTelemetryEvent -Data $data
-    #endregion
-
-    $nullResult = $PSBoundParameters
-    $nullResult.Ensure = 'Absent'
+    Write-Verbose -Message "Getting configuration of the Intune Android App Protection Policy with Id {$Id} and DisplayName {$DisplayName}"
 
     try
     {
-        if ($id -ne '')
+        if (-not $Script:exportedInstance)
         {
-            Write-Verbose -Message "Searching for Policy using Id {$Id}"
-            $policyInfo = Get-MgBetaDeviceAppManagementAndroidManagedAppProtection -Filter "Id eq '$Id'" -ExpandProperty Apps, assignments `
-                -ErrorAction Stop
+            $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
+                -InboundParameters $PSBoundParameters
+
+            #Ensure the proper dependencies are installed in the current environment.
+            Confirm-M365DSCDependencies
+
+            #region Telemetry
+            $ResourceName = $MyInvocation.MyCommand.ModuleName -replace 'MSFT_', ''
+            $CommandName = $MyInvocation.MyCommand
+            $data = Format-M365DSCTelemetryParameters -ResourceName $ResourceName `
+                -CommandName $CommandName `
+                -Parameters $PSBoundParameters
+            Add-M365DSCTelemetryEvent -Data $data
+            #endregion
+
+            $nullResult = $PSBoundParameters
+            $nullResult.Ensure = 'Absent'
+
+            $policyInfo = $null
+            if (-not [string]::IsNullOrEmpty($Id))
+            {
+                Write-Verbose -Message "Searching for Policy using Id {$Id}"
+                $policyInfo = Get-MgBetaDeviceAppManagementAndroidManagedAppProtection -Filter "Id eq '$Id'" -ExpandProperty Apps, assignments `
+                    -ErrorAction SilentlyContinue
+            }
+
             if ($null -eq $policyInfo)
             {
-                Write-Verbose -Message "No Android App Protection Policy with Id {$Id} was found"
-                Write-Verbose -Message "Function will now search for a policy with the same displayName {$Displayname} - If found this policy will be amended"
+                if (-not [string]::IsNullOrEmpty($DisplayName))
+                {
+                    Write-Verbose -Message "Searching for Policy using DisplayName {$DisplayName}"
+                    $policyInfoArray = Get-MgBetaDeviceAppManagementAndroidManagedAppProtection -ExpandProperty Apps, assignments `
+                        -ErrorAction Stop -All:$true
+                    $policyInfo = $policyInfoArray | Where-Object -FilterScript { $_.displayName -eq $DisplayName }
+                }
             }
-        }
-        if ($null -eq $policyInfo)
-        {
-            Write-Verbose -Message "Searching for Policy using DisplayName {$DisplayName}"
-            $policyInfoArray = Get-MgBetaDeviceAppManagementAndroidManagedAppProtection -ExpandProperty Apps, assignments `
-                -ErrorAction Stop -All:$true
-            $policyInfo = $policyInfoArray | Where-Object -FilterScript { $_.displayName -eq $DisplayName }
-        }
-        if ($null -eq $policyInfo)
-        {
-            Write-Verbose -Message "No Android App Protection Policy {$DisplayName} was found"
-            return $nullResult
-        }
 
-        # handle multiple results - throw error - may be able to remediate to specify ID in configuration at later date
-        if ($policyInfo.gettype().isarray)
-        {
-            Write-Verbose -Message "Multiple Android Policies with name {$DisplayName} were found - Where No valid ID is specified Module will only function with unique names, please manually remediate"
-            $nullResult.Ensure = 'ERROR'
-            throw 'Multiple Policies with same displayname identified - Module currently only functions with unique names'
-        }
+            if ($null -eq $policyInfo)
+            {
+                Write-Verbose -Message "No Android App Protection Policy {$DisplayName} was found"
+                return $nullResult
+            }
 
-        Write-Verbose -Message "Found Android App Protection Policy {$DisplayName}"
+            # handle multiple results - throw error - may be able to remediate to specify ID in configuration at later date
+            if ($policyInfo.gettype().isarray)
+            {
+                Write-Verbose -Message "Multiple Android Policies with name {$DisplayName} were found - Where No valid ID is specified Module will only function with unique names, please manually remediate"
+                $nullResult.Ensure = 'ERROR'
+                throw 'Multiple Policies with same displayname identified - Module currently only functions with unique names'
+            }
+
+            Write-Verbose -Message "Found Android App Protection Policy {$DisplayName}"
+        }
+        else
+        {
+            $policyInfo = Get-MgBetaDeviceAppManagementAndroidManagedAppProtection -AndroidManagedAppProtectionId $Script:exportedInstance.Id -ExpandProperty Apps, assignments `
+                -ErrorAction Stop
+        }
 
         $appsArray = @()
         if ($null -ne $policyInfo.Apps)
@@ -285,16 +296,24 @@ function Get-TargetResource
         {
             foreach ($assignment in $policyInfo.Assignments)
             {
+                $groupInfo = Get-MgGroup -GroupId $assignment.Target.AdditionalProperties.groupId -ErrorAction SilentlyContinue
+                $groupValue = $assignment.Target.AdditionalProperties.groupId
+                if ($null -ne $groupInfo)
+                {
+                    $groupValue = $groupInfo.DisplayName
+                }
+
                 switch ($assignment.Target.AdditionalProperties.'@odata.type')
                 {
                     '#microsoft.graph.groupAssignmentTarget'
                     {
-                        $assignmentsArray += $assignment.Target.AdditionalProperties.groupId
+
+                        $assignmentsArray += $groupValue
                     }
 
                     '#microsoft.graph.exclusionGroupAssignmentTarget'
                     {
-                        $exclusionArray += $assignment.Target.AdditionalProperties.groupId
+                        $exclusionArray += $groupValue
                     }
                 }
             }
@@ -350,6 +369,7 @@ function Get-TargetResource
     }
     catch
     {
+        Write-Verbose -Message $_
         if ($_.Exception.Message -eq 'Multiple Policies with same displayname identified - Module currently only functions with unique names')
         {
             throw $_
@@ -651,7 +671,13 @@ function Set-TargetResource
         $PSBoundParameters.Assignments | ForEach-Object {
             if ($_ -ne $null)
             {
-                $assignmentsArray += set-JSONstring -id $_ -type 'Assignments'
+                $groupInfo = Get-MgGroup -Filter "DisplayName eq '$_'"
+                $idValue = $_
+                if (-not [System.String]::IsNullOrEmpty($groupInfo))
+                {
+                    $idValue = $groupInfo.Id
+                }
+                $assignmentsArray += set-JSONstring -id $idValue -type 'Assignments'
             }
         }
         $configstring += ( 'Assignments' + ":`r`n" + ($PSBoundParameters.Assignments | Out-String) + "`r`n" )
@@ -710,7 +736,7 @@ function Set-TargetResource
         $setParams.add('AndroidManagedAppProtectionId', $currentPolicy.id)
         Update-MgBetaDeviceAppManagementAndroidManagedAppProtection @setParams
 
-        Write-Verbose -Message 'Setting Group Assignments...'
+        Write-Verbose -Message "Setting Group Assignments with values:`r`n$(ConvertTo-Json $assignmentsArray -Depth 10)"
         Set-MgBetaDeviceAppManagementTargetedManagedAppConfiguration -TargetedManagedAppConfigurationId $setParams.AndroidManagedAppProtectionId -Assignments $assignmentsArray
 
     }
@@ -1016,7 +1042,20 @@ function Test-TargetResource
     # handle complex parameters - manually for now
     if ($PSBoundParameters.keys -contains 'Assignments' )
     {
-        $targetvalues.add('Assignments', $psboundparameters.Assignments)
+        $assignmentsValue = @()
+        foreach ($assignment in $Assignments)
+        {
+            $groupInfo = Get-MgGroup -GroupId $assignment -ErrorAction SilentlyContinue
+            if ($null -ne $groupInfo)
+            {
+                $assignmentsValue += $groupInfo.DisplayName
+            }
+            else
+            {
+                $assignmentsValue += $assignment
+            }
+        }
+        $targetvalues.add('Assignments', $assignmentsValue)
     }
 
     Write-Verbose -Message 'Starting Exluded Groups Check'
@@ -1147,6 +1186,8 @@ function Export-TargetResource
                 ManagedIdentity       = $ManagedIdentity.IsPresent
                 AccessTokens          = $AccessTokens
             }
+
+            $Script:exportedInstance = $policy
             $Results = Get-TargetResource @params
             if (-not (Test-M365DSCAuthenticationParameter -BoundParameters $Results))
             {
