@@ -149,7 +149,6 @@ function Get-TargetResource
                 {
                     if($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.bundleId)
                     {
-                        $complexMobileAppIdentifier = @{}
                         $complexMobileAppIdentifier = @{
                             #'@odata.type' = "#microsoft.graph.iosMobileAppIdentifier"
                             bundleID       = $currentValue.mobileAppIdentifier.AdditionalProperties.bundleId
@@ -158,7 +157,6 @@ function Get-TargetResource
 
                     if($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.packageId)
                     {
-                        $complexMobileAppIdentifier = @{}
                         $complexMobileAppIdentifier = @{
                             #'@odata.type' = "#microsoft.graph.androidMobileAppIdentifier"
                             packageId       = $currentValue.mobileAppIdentifier.AdditionalProperties.packageId
@@ -167,7 +165,6 @@ function Get-TargetResource
 
                     if($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.windowsAppId)
                     {
-                        $complexMobileAppIdentifier = @{}
                         $complexMobileAppIdentifier = @{
                             #'@odata.type' = "#microsoft.graph.windowsAppIdentifier"
                             windowsAppId       = $currentValue.mobileAppIdentifier.AdditionalProperties.windowsAppId
@@ -175,7 +172,7 @@ function Get-TargetResource
                     }
                     $complexAppsHash = @{}
                     $complexAppsHash.Add('id', $currentValue.Id)
-                    $complexAppsHash.Add('version', $currentValue.Version)
+                    #$complexAppsHash.Add('version', $currentValue.Version)
                     $complexAppsHash.Add('mobileAppIdentifier', $complexMobileAppIdentifier)
                     $complexAppsArray += $complexAppsHash
                 }
@@ -342,30 +339,36 @@ function Set-TargetResource
             foreach($app in $Apps){
                 if($null -ne $app.mobileAppIdentifier.bundleID)
                 {
-                $mobileAppIdentifierHashtable = @{}
-                $mobileAppIdentifierHashtable['@odata.type'] = "#microsoft.graph.iosMobileAppIdentifier"
-                $mobileAppIdentifierHashtable['bundleId'] = $app.mobileAppIdentifier.bundleID
+                    $mobileAppIdentifierHashtable = @{
+                        '@odata.type' = "#microsoft.graph.iosMobileAppIdentifier"
+                        'bundleId' = $app.mobileAppIdentifier.bundleId
+                    }
                 }
 
                 if($null -ne $app.mobileAppIdentifier.packageID)
                 {
-                    $mobileAppIdentifierHashtable = @{}
-                    $mobileAppIdentifierHashtable['@odata.type'] = "#microsoft.graph.androidMobileAppIdentifier"
-                    $mobileAppIdentifierHashtable['packageId'] = $app.mobileAppIdentifier.packageId
+                    $mobileAppIdentifierHashtable = @{
+                        '@odata.type' = "#microsoft.graph.androidMobileAppIdentifier"
+                        'packageId' = $app.mobileAppIdentifier.packageId
+                    }
                 }
 
                 if($null -ne $app.mobileAppIdentifier.windowsAppID)
                 {
-                    $mobileAppIdentifierHashtable = @{}
-                    $mobileAppIdentifierHashtable['@odata.type'] = "#microsoft.graph.windowsAppIdentifier"
-                    $mobileAppIdentifierHashtable['windowsAppId'] = $app.mobileAppIdentifier.windowsAppId
+                    $mobileAppIdentifierHashtable = @{
+                        '@odata.type' = "#microsoft.graph.windowsAppIdentifier"
+                        'windowsAppId' = $app.mobileAppIdentifier.windowsAppId
+                    }
                 }
 
-                $appHashtable = @{}
-                $appHashtable['id'] = $App.Id
-                $appHashtable['version'] = $App.Version
-                $appHashtable['mobileAppIdentifier'] = $mobileAppIdentifierHashtable
+                $appHashtable = @{
+                    'id' = $App.Id
+                    #'version' = $App.Version
+                    'mobileAppIdentifier' = $mobileAppIdentifierHashtable
+                }
+
                 $appsArray += $appHashtable
+
             }
             $creationParams.Add('apps', $appsArray)
         }

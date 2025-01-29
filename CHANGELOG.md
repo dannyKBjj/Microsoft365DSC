@@ -16,9 +16,8 @@
 * IntuneAppConfigurationPolicy
   * Fixes an issue with fetching a policy that does not exist.
     FIXES [#5666](https://github.com/microsoft/Microsoft365DSC/issues/5666)
-  * Adds support for testing drift in Apps setting. 
-    Set-TargetResource now able to create policies, but is still unable to update them (appears to be an issue with MgGraph).
-    PARTIALLY FIXES [#5566](https://github.com/microsoft/Microsoft365DSC/issues/5566)
+  * Adds support for testing drift in Apps settings. 
+    FIXES [#5566](https://github.com/microsoft/Microsoft365DSC/issues/5566)
 * IntuneApplicationControlPolicyWindows10
   * Fixes an issue with fetching a policy that does not exist.
 * IntuneAppProtectionPolicyAndroid
