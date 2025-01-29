@@ -140,39 +140,35 @@ function Get-TargetResource
 
         Write-Verbose -Message "Found App Configuration Policy with Id {$($configPolicy.Id)} and DisplayName {$($configPolicy.DisplayName)}"
         #get the full app details and replace what was retrieved using Get-MgBetaDeviceAppManagementTargetedManagedAppConfiguration
-        if($null -ne $configPolicy.Apps)
+        if ($null -ne $configPolicy.Apps)
         {
             $AppConfiguration = Get-MgBetaDeviceAppManagementTargetedManagedAppConfigurationApp -TargetedManagedAppConfigurationId $configPolicy.Id
             $complexAppsArray = @()
             foreach($currentValue in $AppConfiguration){
                 if ($null -ne $currentValue)
                 {
-                    if($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.bundleId)
+                    if ($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.bundleId)
                     {
                         $complexMobileAppIdentifier = @{
-                            #'@odata.type' = "#microsoft.graph.iosMobileAppIdentifier"
                             bundleID       = $currentValue.mobileAppIdentifier.AdditionalProperties.bundleId
                         }
                     }
 
-                    if($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.packageId)
+                    if ($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.packageId)
                     {
                         $complexMobileAppIdentifier = @{
-                            #'@odata.type' = "#microsoft.graph.androidMobileAppIdentifier"
                             packageId       = $currentValue.mobileAppIdentifier.AdditionalProperties.packageId
                         }
                     }
 
-                    if($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.windowsAppId)
+                    if ($null -ne $currentValue.mobileAppIdentifier.AdditionalProperties.windowsAppId)
                     {
                         $complexMobileAppIdentifier = @{
-                            #'@odata.type' = "#microsoft.graph.windowsAppIdentifier"
                             windowsAppId       = $currentValue.mobileAppIdentifier.AdditionalProperties.windowsAppId
                         }
                     }
                     $complexAppsHash = @{}
                     $complexAppsHash.Add('id', $currentValue.Id)
-                    #$complexAppsHash.Add('version', $currentValue.Version)
                     $complexAppsHash.Add('mobileAppIdentifier', $complexMobileAppIdentifier)
                     $complexAppsArray += $complexAppsHash
                 }
@@ -337,7 +333,7 @@ function Set-TargetResource
         {
             $appsArray = @()
             foreach($app in $Apps){
-                if($null -ne $app.mobileAppIdentifier.bundleID)
+                if ($null -ne $app.mobileAppIdentifier.bundleID)
                 {
                     $mobileAppIdentifierHashtable = @{
                         '@odata.type' = "#microsoft.graph.iosMobileAppIdentifier"
@@ -345,7 +341,7 @@ function Set-TargetResource
                     }
                 }
 
-                if($null -ne $app.mobileAppIdentifier.packageID)
+                if ($null -ne $app.mobileAppIdentifier.packageID)
                 {
                     $mobileAppIdentifierHashtable = @{
                         '@odata.type' = "#microsoft.graph.androidMobileAppIdentifier"
@@ -353,7 +349,7 @@ function Set-TargetResource
                     }
                 }
 
-                if($null -ne $app.mobileAppIdentifier.windowsAppID)
+                if ($null -ne $app.mobileAppIdentifier.windowsAppID)
                 {
                     $mobileAppIdentifierHashtable = @{
                         '@odata.type' = "#microsoft.graph.windowsAppIdentifier"
@@ -363,7 +359,6 @@ function Set-TargetResource
 
                 $appHashtable = @{
                     'id' = $App.Id
-                    #'version' = $App.Version
                     'mobileAppIdentifier' = $mobileAppIdentifierHashtable
                 }
 
