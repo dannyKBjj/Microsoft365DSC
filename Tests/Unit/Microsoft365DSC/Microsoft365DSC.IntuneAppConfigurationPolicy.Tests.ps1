@@ -93,8 +93,6 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     Ensure      = 'Present'
                     Credential  = $Credential
                     RoleScopeTagIds             = @("0")
-                    DeployedAppCount            = 2
-                    IsAssigned                  = $False
                     TargetedAppManagementLevels = "unspecified"
                     AppGroupType                = "selectedPublicApps"
                     CustomSettings                              = [CimInstance[]]@(
@@ -113,8 +111,6 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                         Description = 'Different Value'
                         Id          = 'A_19dbaff5-9aff-48b0-a60d-d0471ddaf141'
                         RoleScopeTagIds             = @("0")
-                        DeployedAppCount            = 2
-                        IsAssigned                  = $False
                         TargetedAppManagementLevels = "unspecified"
                         AppGroupType                = "selectedPublicApps"
                         CustomSettings              = @(
@@ -148,9 +144,7 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     Description = 'Test Definition'
                     Ensure      = 'Present'
                     Credential  = $Credential
-                   RoleScopeTagIds             = @("0")
-                    DeployedAppCount            = 2
-                    IsAssigned                  = $False
+                    RoleScopeTagIds             = @("0")
                     TargetedAppManagementLevels = "unspecified"
                     AppGroupType                = "selectedPublicApps"
                      CustomSettings                              = [CimInstance[]]@(
@@ -168,9 +162,7 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                         DisplayName = 'Test App Configuration Policy Desire State'
                         Description = 'Test Definition'
                         Id          = 'A_19dbaff5-9aff-48b0-a60d-d0471ddaf141'
-                      RoleScopeTagIds             = @("0")
-                        DeployedAppCount            = 2
-                        IsAssigned                  = $False
+                        RoleScopeTagIds             = @("0")
                         TargetedAppManagementLevels = "unspecified"
                         AppGroupType                = "selectedPublicApps"
                           CustomSettings              = @(
@@ -199,9 +191,7 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     Description = 'Test Definition'
                     Ensure      = 'Absent'
                     Credential  = $Credential
-                   RoleScopeTagIds             = @("0")
-                    DeployedAppCount            = 2
-                    IsAssigned                  = $False
+                    RoleScopeTagIds             = @("0")
                     TargetedAppManagementLevels = "unspecified"
                     AppGroupType                = "selectedPublicApps"
                      CustomSettings              = [CimInstance[]]@(
@@ -219,9 +209,7 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                         DisplayName = 'Test App Configuration Policy'
                         Description = 'Test Definition'
                         Id          = 'A_19dbaff5-9aff-48b0-a60d-d0471ddaf141'
-                       RoleScopeTagIds             = @("0")
-                        DeployedAppCount            = 2
-                        IsAssigned                  = $False
+                        RoleScopeTagIds             = @("0")
                         TargetedAppManagementLevels = "unspecified"
                         AppGroupType                = "selectedPublicApps"
                         Apps                        = @()
@@ -263,8 +251,6 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                         Description = 'Test Definition'
                         Id          = 'A_19dbaff5-9aff-48b0-a60d-d0471ddaf141'
                         RoleScopeTagIds             = @("0")
-                        DeployedAppCount            = 2
-                        IsAssigned                  = $False
                         TargetedAppManagementLevels = "unspecified"
                         AppGroupType                = "selectedPublicApps"
                         CustomSettings              = @(

@@ -21,14 +21,6 @@ function Get-TargetResource
         $RoleScopeTagIds,
 
         [Parameter()]
-        [System.Int32]
-        $DeployedAppCount,
-
-        [Parameter()]
-        [System.Boolean]
-        $IsAssigned,
-
-        [Parameter()]
         [System.String]
         [ValidateSet('unspecified','unmanaged','mdm','androidEnterprise','androidEnterpriseDedicatedDevicesWithAzureAdSharedMode','androidOpenSourceProjectUserAssociated','androidOpenSourceProjectUserless','unknownFutureValue')]
         $TargetedAppManagementLevels,
@@ -204,8 +196,6 @@ function Get-TargetResource
             Managedidentity             = $ManagedIdentity.IsPresent
             AccessTokens                = $AccessTokens
             RoleScopeTagIds             = $configPolicy.RoleScopeTagIds
-            DeployedAppCount            = $configPolicy.DeployedAppCount
-            IsAssigned                  = $configPolicy.IsAssigned
             TargetedAppManagementLevels = [String]$configPolicy.TargetedAppManagementLevels
             AppGroupType                = [String]$configPolicy.AppGroupType
             Apps                        = $complexAppsArray
@@ -256,14 +246,6 @@ function Set-TargetResource
         [Parameter()]
         [System.String[]]
         $RoleScopeTagIds,
-
-        [Parameter()]
-        [System.Int32]
-        $DeployedAppCount,
-
-        [Parameter()]
-        [System.Boolean]
-        $IsAssigned,
 
         [Parameter()]
         [System.String]
@@ -404,7 +386,7 @@ function Set-TargetResource
     elseif ($Ensure -eq 'Present' -and $currentconfigPolicy.Ensure -eq 'Present')
     {
         Write-Verbose -Message "Updating Intune App Configuration Policy {$DisplayName}"
-
+        #apps handled separately as not supported by Update-MgBetaDeviceAppManagementTargetedManagedAppConfiguration
         $updateParams = @{
             targetedManagedAppConfigurationId = $currentconfigPolicy.Id
             displayName                       = $DisplayName
@@ -418,43 +400,46 @@ function Set-TargetResource
         
         if ($null -ne $Apps)
         {
-            Write-Verbose -Message "Updating 'Apps' is not supported, if Test-TargetResource still fails after PATCH, manual remediation may be required."
-        <#
-        #Commented out this section because the update- cmdlet cannot handle 'apps' even though new- can. 
-        #This is likely to be a bug with Update-MgBetaDeviceAppManagementTargetedManagedAppConfiguration.
-        #Unfortunately this means that the applications can't be supported for update- , only when creating new policies. 
             $appsArray = @()
-            foreach($app in $Apps){
-                if($null -ne $app.mobileAppIdentifier.bundleID)
+            foreach ($app in $Apps)
+            {
+                if ($null -ne $app.mobileAppIdentifier.bundleID)
                 {
-                $mobileAppIdentifierHashtable = @{}
-                $mobileAppIdentifierHashtable['@odata.type'] = "#microsoft.graph.iosMobileAppIdentifier"
-                $mobileAppIdentifierHashtable['bundleId'] = $app.mobileAppIdentifier.bundleID
+                    $mobileAppIdentifierHashtable = @{
+                        '@odata.type' = "#microsoft.graph.iosMobileAppIdentifier"
+                        bundleId      = $app.mobileAppIdentifier.bundleID
+                    }
                 }
 
-                if($null -ne $app.mobileAppIdentifier.packageID)
+                if ($null -ne $app.mobileAppIdentifier.packageID)
                 {
-                    $mobileAppIdentifierHashtable = @{}
-                    $mobileAppIdentifierHashtable['@odata.type'] = "#microsoft.graph.androidMobileAppIdentifier"
-                    $mobileAppIdentifierHashtable['packageId'] = $app.mobileAppIdentifier.packageId
+                    $mobileAppIdentifierHashtable = @{
+                        '@odata.type' = "#microsoft.graph.androidMobileAppIdentifier"
+                        packageId     = $app.mobileAppIdentifier.packageId
+                    }
                 }
 
-                if($null -ne $app.mobileAppIdentifier.windowsAppID)
+                if ($null -ne $app.mobileAppIdentifier.windowsAppID)
                 {
-                    $mobileAppIdentifierHashtable = @{}
-                    $mobileAppIdentifierHashtable['@odata.type'] = "#microsoft.graph.windowsAppIdentifier"
-                    $mobileAppIdentifierHashtable['windowsAppId'] = $app.mobileAppIdentifier.windowsAppId
+                    $mobileAppIdentifierHashtable = @{
+                        '@odata.type' = "#microsoft.graph.windowsAppIdentifier"
+                        windowsAppId  = $app.mobileAppIdentifier.windowsAppId
+                    }
                 }
 
-                $appHashtable = @{}
-                $appHashtable['id'] = $App.Id
-                $appHashtable['version'] = $App.Version
-                $appHashtable['mobileAppIdentifier'] = $mobileAppIdentifierHashtable
-                $appsArray += $appHashtable
+                $appsArray += @{
+                    'mobileAppIdentifier' = $mobileAppIdentifierHashtable
+                }
             }
-            
-            $updateParams.Add('apps', $appsArray)
-            #>
+
+            $appsBody = @{
+                appGroupType = $AppGroupType
+                apps = $appsArray
+            }
+
+            Write-Verbose -Message "Updating Apps for Intune App Configuration Policy {$DisplayName}"
+            $Uri = (Get-MSCloudLoginConnectionProfile -Workload MicrosoftGraph).ResourceUrl + "beta/deviceAppManagement/targetedManagedAppConfigurations('$($currentconfigPolicy.Id)')/targetApps"
+            Invoke-MgGraphRequest -Method POST -Uri $Uri -Body $($appsBody | ConvertTo-Json -Depth 10) -Verbose
         }
 
         Update-MgBetaDeviceAppManagementTargetedManagedAppConfiguration @updateParams
@@ -492,14 +477,6 @@ function Test-TargetResource
         [Parameter()]
         [System.String[]]
         $RoleScopeTagIds,
-
-        [Parameter()]
-        [System.Int32]
-        $DeployedAppCount,
-
-        [Parameter()]
-        [System.Boolean]
-        $IsAssigned,
 
         [Parameter()]
         [System.String]
